@@ -484,6 +484,5 @@ $RECYCLE.BIN/
 *.swp
 
 .vs/
-Classifieds.Services/obj/
-Classifieds-API/obj/
+**obj/
 
