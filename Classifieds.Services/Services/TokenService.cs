@@ -22,7 +22,7 @@ namespace Services.Services
             var claims = new List<Claim>()
             {
                 new (JwtRegisteredClaimNames.Name, user.AccountName),
-                new (JwtRegisteredClaimNames.NameId, user.Id),
+                new (JwtRegisteredClaimNames.NameId, user.Id.ToString()),
                 new Claim(ClaimTypes.Role, "")
 
             };

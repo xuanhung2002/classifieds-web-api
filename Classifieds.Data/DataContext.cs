@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Classifieds.Data.Entites;
+using Microsoft.EntityFrameworkCore;
 
 namespace Classifieds.Data
 {
@@ -6,5 +7,7 @@ namespace Classifieds.Data
     {
         public DataContext(DbContextOptions<DataContext> options) : base(options) { }
       
+
+        public DbSet<User> Users { get; set; }
     }
 }
