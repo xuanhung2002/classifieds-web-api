@@ -3,11 +3,20 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.8.34511.84
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Classifieds-API", "Classifieds-API\Classifieds-API.csproj", "{B2A0D911-540D-4341-835C-185213257C16}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Classifieds-API", "Classifieds-API\Classifieds-API.csproj", "{B2A0D911-540D-4341-835C-185213257C16}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Classifieds.Services", "Classifieds.Services\Classifieds.Services.csproj", "{00492CEA-0650-4CE1-B999-215F6CB56D79}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Classifieds.Services", "Classifieds.Services\Classifieds.Services.csproj", "{00492CEA-0650-4CE1-B999-215F6CB56D79}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Classifieds.Data", "Classifieds.Data\Classifieds.Data.csproj", "{333D7720-CFA0-42F4-9EA2-3926E7D11FBD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Classifieds.Data", "Classifieds.Data\Classifieds.Data.csproj", "{333D7720-CFA0-42F4-9EA2-3926E7D11FBD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Classifieds.UnitOfWork", "Classifieds.UnitOfWork\Classifieds.UnitOfWork.csproj", "{3B12E419-8D78-4843-9F32-5CE6E21EA711}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Classifieds.Repository", "Classifieds.Repository\Classifieds.Repository.csproj", "{D1E574CC-F4F0-40D6-A0C2-F2DB69AFA574}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{379A4D99-7628-4A32-8092-A9228E04F2E9}"
+	ProjectSection(SolutionItems) = preProject
+		command.txt = command.txt
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +36,14 @@ Global
 		{333D7720-CFA0-42F4-9EA2-3926E7D11FBD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{333D7720-CFA0-42F4-9EA2-3926E7D11FBD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{333D7720-CFA0-42F4-9EA2-3926E7D11FBD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3B12E419-8D78-4843-9F32-5CE6E21EA711}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3B12E419-8D78-4843-9F32-5CE6E21EA711}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3B12E419-8D78-4843-9F32-5CE6E21EA711}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3B12E419-8D78-4843-9F32-5CE6E21EA711}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D1E574CC-F4F0-40D6-A0C2-F2DB69AFA574}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D1E574CC-F4F0-40D6-A0C2-F2DB69AFA574}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D1E574CC-F4F0-40D6-A0C2-F2DB69AFA574}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D1E574CC-F4F0-40D6-A0C2-F2DB69AFA574}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
