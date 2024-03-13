@@ -1,12 +1,12 @@
 ﻿using Classifieds.Data.Entites;
+using Classifieds.Services.IServices;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using Services.IServices;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace Services.Services
+namespace Classifieds.Services.Services
 {
     public class TokenService : ITokenService
     {

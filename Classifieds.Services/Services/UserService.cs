@@ -4,5 +4,6 @@ namespace Classifieds.Services.Services
 {
     public class UserService : IUserService
     {
+
     }
 }

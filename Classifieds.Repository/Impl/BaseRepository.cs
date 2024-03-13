@@ -1,7 +1,7 @@
 ﻿using Classifieds.Data;
 using Classifieds.Data.Entites;
+using Classifieds.Repository.Interface;
 using Microsoft.EntityFrameworkCore;
-using Repository.Interface;
 using System.Linq.Expressions;
 
 namespace Classifieds.Repository.Impl
