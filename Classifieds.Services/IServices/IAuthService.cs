@@ -1,10 +1,10 @@
 ﻿using Classifieds.Data.DTOs;
 
-namespace Services.IServices
+namespace Classifieds.Services.IServices
 {
     public interface IAuthService
     {
-        Task<Boolean> Register(RegisterDto registerDto);
-        Task<String> Login(LoginDto loginDto);
+        Task<bool> Register(RegisterDto registerDto);
+        Task<string> Login(LoginDto loginDto);
     }
 }

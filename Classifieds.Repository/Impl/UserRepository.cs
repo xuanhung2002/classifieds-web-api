@@ -1,12 +1,6 @@
 ﻿using Classifieds.Data;
 using Classifieds.Data.Entites;
 using Classifieds.Repository.Interface;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Classifieds.Repository.Impl
 {

@@ -1,7 +1,6 @@
-﻿
-using Classifieds.Data.Entites;
+﻿using Classifieds.Data.Entites;
 
-namespace Services.IServices
+namespace Classifieds.Services.IServices
 {
     public interface ITokenService
     {
