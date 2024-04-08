@@ -5,6 +5,5 @@ namespace Classifieds.UnitOfWork
     public interface IUnitOfWork : IDisposable
     {
         IUserRepository Users { get; }
-        Task<bool> Complete();
     }
 }

@@ -52,8 +52,7 @@ namespace Classifieds.Services.Services
                 PasswordHash = hashFunc.ComputeHash(passwordBytes),
                 PasswordSalt = hashFunc.Key
             };
-            await _unitOfWork.Users.Add(newUser);
-            await _unitOfWork.Complete();
+            await _unitOfWork.Users.AddAsync(newUser);
             return true;
         }
     }
