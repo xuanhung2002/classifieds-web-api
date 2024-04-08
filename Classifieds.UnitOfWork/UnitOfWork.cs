@@ -18,12 +18,6 @@ namespace Classifieds.UnitOfWork
             Users = new UserRepository(_context);
         }
         
-        public async Task<bool> Complete()
-        {
-           var res = await _context.SaveChangesAsync() > 0;
-           return res;
-        }
-
         public void Dispose()
         {
             _context.Dispose();

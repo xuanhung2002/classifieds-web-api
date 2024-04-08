@@ -12,8 +12,8 @@ namespace Classifieds.Repository.Impl
 
         public async Task<User?> GetUserByAccountName(string accountName)
         {
-            var res = await Find(u => u.AccountName == accountName);
-            return res == null ? null : res.FirstOrDefault();
+            var res = await FindAsync(u => u.AccountName == accountName);
+            return res == null ? null : res;
         }
     }
 }
