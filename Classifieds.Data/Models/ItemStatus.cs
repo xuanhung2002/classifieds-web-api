@@ -4,9 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Classifieds.Data.Entites
+namespace Classifieds.Data.Models
 {
-    public class Notification
+    public enum ItemStatus
     {
+        Sold,
+        Unsold
     }
 }

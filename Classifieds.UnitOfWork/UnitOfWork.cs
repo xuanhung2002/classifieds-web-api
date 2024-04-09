@@ -12,10 +12,14 @@ namespace Classifieds.UnitOfWork
     {
         private readonly DataContext _context;
         public IUserRepository Users { get; private set; }
+
+        public IPostRepository Posts { get; private set; }
+
         public UnitOfWork(DataContext context)
         {
             _context = context;
             Users = new UserRepository(_context);
+            Posts = new PostRepository(_context);
         }
         
         public void Dispose()

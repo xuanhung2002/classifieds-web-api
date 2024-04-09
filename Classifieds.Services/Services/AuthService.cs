@@ -1,5 +1,5 @@
 ﻿using Classifieds.Data.DTOs;
-using Classifieds.Data.Entites;
+using Classifieds.Data.Entities;
 using Classifieds.Services.IServices;
 using Classifieds.UnitOfWork;
 using System.Security.Cryptography;

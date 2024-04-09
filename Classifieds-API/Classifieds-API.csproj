@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.2">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -18,7 +19,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Classifieds.Data\Classifieds.Data.csproj" />
+    <ProjectReference Include="..\Classifieds.Repository\Classifieds.Repository.csproj" />
     <ProjectReference Include="..\Classifieds.Services\Classifieds.Services.csproj" />
+    <ProjectReference Include="..\Classifieds.UnitOfWork\Classifieds.UnitOfWork.csproj" />
   </ItemGroup>
 
 </Project>
