@@ -1,7 +1,10 @@
 ﻿using Classifieds.Services.IServices;
 using Classifieds.Services.Services;
 using Classifieds.UnitOfWork;
+using CloudinaryDotNet;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
@@ -10,6 +13,15 @@ namespace Classifieds_API.Extensions
 {
     public static class ServiceCollectionExtension
     {
+
+        public static void AddServices(this IServiceCollection services)
+        {
+            services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<ITokenService, TokenService>();
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<IImageService, ImageService>();
+        }
         public static void AddJwt(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -70,12 +82,18 @@ namespace Classifieds_API.Extensions
             });
         }
 
-        public static void AddServices(this IServiceCollection services)
+        public static void AddCloudinary(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddScoped<IAuthService, AuthService>();
-            services.AddScoped<IUserService, UserService>();
-            services.AddScoped<ITokenService, TokenService>();
-            services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.Configure<CloudinarySettings>(configuration.GetSection("CloudinarySettings"));
+            services.AddSingleton(x =>
+            {
+                var cloudinarySettings = x.GetRequiredService<IOptions<CloudinarySettings>>().Value;
+                return new Cloudinary(new Account(
+                    cloudinarySettings.CloudName,
+                    cloudinarySettings.ApiKey,
+                    cloudinarySettings.ApiSecret));
+            });
         }
+
     }
 }

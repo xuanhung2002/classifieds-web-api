@@ -1,4 +1,4 @@
-﻿using Classifieds.Data.Entites;
+﻿using Classifieds.Data.Entities;
 using Classifieds.Services.IServices;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;

@@ -7,6 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="CloudinaryDotNet" Version="1.26.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.2" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Classifieds.Data\Classifieds.Data.csproj" />
     <ProjectReference Include="..\Classifieds.UnitOfWork\Classifieds.UnitOfWork.csproj" />
   </ItemGroup>

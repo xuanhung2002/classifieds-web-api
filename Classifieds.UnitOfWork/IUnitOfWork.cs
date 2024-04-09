@@ -5,5 +5,7 @@ namespace Classifieds.UnitOfWork
     public interface IUnitOfWork : IDisposable
     {
         IUserRepository Users { get; }
+        IPostRepository Posts { get; }
+
     }
 }

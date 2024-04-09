@@ -1,4 +1,4 @@
-﻿using Classifieds.Data.Entites;
+﻿using Classifieds.Data.Entities;
 
 namespace Classifieds.Repository.Interface
 {
