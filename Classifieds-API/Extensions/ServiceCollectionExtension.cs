@@ -1,9 +1,10 @@
-﻿using Classifieds.Services.IServices;
+﻿using Classifieds.Repository;
+using Classifieds.Services.IServices;
 using Classifieds.Services.Services;
-using Classifieds.UnitOfWork;
 using CloudinaryDotNet;
+using Common;
+using Common.Config;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -16,11 +17,13 @@ namespace Classifieds_API.Extensions
 
         public static void AddServices(this IServiceCollection services)
         {
+            services.AddScoped<IDBRepository, DBRepository>();
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<ITokenService, TokenService>();
-            services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IImageService, ImageService>();
+            services.AddScoped<IPostService, PostService>();
+            services.AddScoped<IEmailService, EmailService>();
         }
         public static void AddJwt(this IServiceCollection services, IConfiguration configuration)
         {
@@ -34,7 +37,7 @@ namespace Classifieds_API.Extensions
                       ValidateLifetime = false,
                       ValidateIssuerSigningKey = true,
                       IssuerSigningKey = new SymmetricSecurityKey(
-                          Encoding.UTF8.GetBytes(configuration["JwtSecretKey"]!))
+                          Encoding.UTF8.GetBytes(AppSettings.JwtSecretKey!))
                   };
               });
 
@@ -66,19 +69,19 @@ namespace Classifieds_API.Extensions
                     Description = "Enter 'Bearer' [space] and then your valid token in the text input below.\r\n\r\nExample: \"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ8\"",
                 });
                 c.AddSecurityRequirement(new OpenApiSecurityRequirement
-        {
-            {
-                new OpenApiSecurityScheme
                 {
-                    Reference = new OpenApiReference
                     {
-                        Type = ReferenceType.SecurityScheme,
-                        Id = "Bearer"
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            }
+                        },
+                        Array.Empty<string>()
                     }
-                },
-                Array.Empty<string>()
-            }
-        });
+                });
             });
         }
 
@@ -95,5 +98,10 @@ namespace Classifieds_API.Extensions
             });
         }
 
+        public static void AddAutoMapper(this IServiceCollection service)
+        {
+            var mapper = MappingConfig.RegisterMap().CreateMapper();
+            service.AddSingleton(mapper);
+        }
     }
 }

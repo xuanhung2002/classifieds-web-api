@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Classifieds.Data.DTOs
+namespace Classifieds.Data.DTOs.UserDtos
 {
 
     public class LoginDto
