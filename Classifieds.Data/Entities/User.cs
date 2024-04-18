@@ -6,7 +6,7 @@ namespace Classifieds.Data.Entities
     public class User : BaseEntity
     {
         public string Name { get; set; } = null!;
-        public string PhoneNumber { get; set; } = null!;
+        public string? PhoneNumber { get; set; } = null!;
         public string Email { get; set; } = null!;
         public string AccountName { get; set; } = null!;
         public byte[] PasswordHash { get; set; } = null!;
@@ -18,8 +18,5 @@ namespace Classifieds.Data.Entities
         public DateTime? ResetTokenExpires { get; set; }
         public DateTime? PasswordReset { get; set; }
 
-        public ICollection<Post> Posts { get;} = new List<Post>();
-
-        public ICollection<Notification> Notifications { get;} = new List<Notification>();
     }
 }

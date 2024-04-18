@@ -1,12 +1,7 @@
 ﻿using Classifieds.Data.Models;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Classifieds.Data.Entities
 {
@@ -18,6 +13,8 @@ namespace Classifieds.Data.Entities
         public decimal Price { get; set; }
         [EnumDataType(typeof(ItemCondition))]
         public ItemCondition ItemCondition { get; set; }
+        [EnumDataType(typeof(ItemStatus))]
+        public ItemStatus Status { get; set; }
         public string AddressJson { get; set; } = null!;
         [NotMapped]
         public Address? Address
@@ -27,6 +24,8 @@ namespace Classifieds.Data.Entities
         }
 
         public Guid UserId{ get; set; }
-        public User User { get; set; }
+
+        public Guid CategoryId { get; set; }
+
     }
 }

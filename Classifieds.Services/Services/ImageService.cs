@@ -1,11 +1,6 @@
 ﻿using Classifieds.Services.IServices;
 using CloudinaryDotNet.Actions;
 using CloudinaryDotNet;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Classifieds.Services.Services
 {
@@ -42,5 +37,12 @@ namespace Classifieds.Services.Services
 
             return false;
         }
+
+        public string UploadImage(Stream image)
+        {
+            var uploadResult = UploadFile(image, Guid.NewGuid().ToString());
+            return uploadResult != null ? uploadResult.Url.ToString() : string.Empty;
+        }
+
     }
 }

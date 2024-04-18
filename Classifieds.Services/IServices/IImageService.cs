@@ -11,5 +11,6 @@ namespace Classifieds.Services.IServices
     {
         ImageUploadResult? UploadFile(Stream fileStream, string fileName);
         bool DeleteFile(string publicId);
+        public string UploadImage(Stream stream);
     }
 }

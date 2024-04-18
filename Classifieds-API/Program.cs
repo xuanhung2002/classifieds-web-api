@@ -1,21 +1,28 @@
 using Classifieds.Data;
 using Classifieds_API.Extensions;
+using Classifieds_API.Middleware;
+using Common;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 IConfiguration configuration = builder.Configuration;
+
+// Configure the application's configuration settings
+builder.Configuration.SetBasePath(AppDomain.CurrentDomain.BaseDirectory);
+builder.Configuration.AddJsonFile("appsettings.json", false, true);
+builder.Configuration.AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", true, true);
+// Map AppSettings section in appsettings.json file value to AppSetting model
+builder.Configuration.GetSection("AppSettings").Get<AppSettings>(options => options.BindNonPublicProperties = true);
+
 // Add services to the container.
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 
-
-
-var connectionString = configuration.GetConnectionString("DefaultConnection");
+//var connectionString = configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<DataContext>(
-    dbContextOptions => dbContextOptions.UseSqlServer(connectionString)
+    dbContextOptions => dbContextOptions.UseSqlServer(AppSettings.ConnectionStrings)
 );
 
 
@@ -23,6 +30,7 @@ builder.Services.AddSwagger();
 builder.Services.AddJwt(configuration);
 builder.Services.AddServices();
 builder.Services.AddCloudinary(configuration);
+builder.Services.AddAutoMapper();
 
 var app = builder.Build();
 
@@ -33,6 +41,8 @@ try
     var dataContext = serviceProvider.GetRequiredService<DataContext>();
     dataContext.Database.EnsureCreated();
     Console.WriteLine("MIGRATIONNNNNNNNNNNN");
+    Console.WriteLine("Seed category");
+    DbInitialize.Initialize(dataContext);
 }
 catch
 {
@@ -46,6 +56,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseMiddleware<ErrorHandlerMiddleware>();
+app.UseMiddleware<JwtMiddleware>();
 app.UseHttpsRedirection();
 
 app.UseAuthorization();

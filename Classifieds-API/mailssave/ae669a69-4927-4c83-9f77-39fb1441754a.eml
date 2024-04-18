@@ -1,0 +1,11 @@
+From: Classifieds System <classifieds.system@gmail.com>
+Date: Thu, 18 Apr 2024 23:15:52 +0700
+Subject: Sign-up Verification API - Reset Password
+Message-Id: <JETLRM70UMU4.Y5HRQP0KUHXU2@desktop-7mjg1me>
+Sender: Classifieds System <classifieds.system@gmail.com>
+To: xuanhungcuty2002@gmail.com
+MIME-Version: 1.0
+Content-Type: text/html; charset=utf-8
+
+<p>Please use the below token to reset your password with the <code>/accounts/reset-password</code> api route:</p>
+                            <p><code>BE6765CB4A08375B0DAF915B3ED24E8FDE7491BE3B074708AC545B3A5CF8CBCB529EAE86B76B5417D7C6A16587BCDEFFE01A88D1DC4E8EBA3B11B1D659A7D1E1</code></p>

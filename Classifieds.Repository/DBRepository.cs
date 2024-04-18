@@ -1,23 +1,22 @@
 ﻿using Classifieds.Data;
 using Classifieds.Data.Entities;
-using Classifieds.Repository.Interface;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Linq.Expressions;
 
-namespace Classifieds.Repository.Impl
+namespace Classifieds.Repository
 {
-    public class BaseRepository<T> : IBaseRepository<T> where T : class
+    public class DBRepository : IDBRepository
     {
         protected readonly DataContext _context;
-        public BaseRepository(DataContext context)
+        public DBRepository(DataContext context)
         {
             _context = context;
         }
 
-        public async Task<T> AddAsync(T entity, bool clearTracker = false)
-        {   
-            if(entity is BaseEntity baseEntity)
+        public async Task<T> AddAsync<T>(T entity, bool clearTracker = false) where T : class
+        {
+            if (entity is BaseEntity baseEntity)
             {
                 baseEntity.CreatedAt = DateTime.Now;
             }
@@ -26,9 +25,9 @@ namespace Classifieds.Repository.Impl
             return res.Entity;
         }
 
-        public async Task<int> AddRangeAsync(IEnumerable<T> entities, bool clearTracker = false)
+        public async Task<int> AddRangeAsync<T>(IEnumerable<T> entities, bool clearTracker = false) where T : class
         {
-            foreach(var entity in entities)
+            foreach (var entity in entities)
             {
                 if (entity is BaseEntity baseEntity)
                 {
@@ -40,7 +39,7 @@ namespace Classifieds.Repository.Impl
             return res;
         }
 
-        public async Task<int> DeleteAsync(T entity, bool clearTracker = false)
+        public async Task<int> DeleteAsync<T>(T entity, bool clearTracker = false) where T : class
         {
             _context.Set<T>().Remove(entity);
             var res = await SaveChangesAsync(clearTracker);
@@ -48,42 +47,42 @@ namespace Classifieds.Repository.Impl
 
         }
 
-        public async Task<int> DeleteRangeAsync(IEnumerable<T> entities, bool clearTracker = false)
+        public async Task<int> DeleteRangeAsync<T>(IEnumerable<T> entities, bool clearTracker = false) where T : class
         {
             _context.Set<T>().RemoveRange(entities);
             var res = await SaveChangesAsync(clearTracker);
             return res;
         }
 
-        public async Task<T?> FindAsync(Expression<Func<T, bool>> predicate)
+        public async Task<T?> FindAsync<T>(Expression<Func<T, bool>> predicate) where T : class
         {
             return await _context.Set<T>().FirstOrDefaultAsync(predicate);
         }
 
-        public async Task<T?> FindForUpdateAsync(Expression<Func<T, bool>> predicate)
+        public async Task<T?> FindForUpdateAsync<T>(Expression<Func<T, bool>> predicate) where T : class
         {
             return await _context.Set<T>().AsTracking().FirstOrDefaultAsync(predicate);
         }
 
-        public async Task<List<T>> GetAsync(Expression<Func<T, bool>> predicate = default)
+        public async Task<List<T>> GetAsync<T>(Expression<Func<T, bool>> predicate = default) where T : class
         {
-            if(predicate == null)
+            if (predicate == null)
             {
                 return await _context.Set<T>().ToListAsync();
             }
             return await _context.Set<T>().Where(predicate).ToListAsync();
         }
 
-        public async Task<List<R>> GetAsync<R>(Expression<Func<T, R>> selector, Expression<Func<T, bool>> predicate = default)
+        public async Task<List<R>> GetAsync<T, R>(Expression<Func<T, R>> selector, Expression<Func<T, bool>> predicate = default) where T : class
         {
-            if(predicate == null)
+            if (predicate == null)
             {
                 return await _context.Set<T>().Select(selector).ToListAsync();
             }
             return await _context.Set<T>().Where(predicate).Select(selector).ToListAsync();
         }
 
-        public IQueryable<T> GetSet(Expression<Func<T, bool>> predicate = null)
+        public IQueryable<T> GetSet<T>(Expression<Func<T, bool>> predicate = null) where T : class
         {
             if (predicate == null)
             {
@@ -92,7 +91,7 @@ namespace Classifieds.Repository.Impl
             return _context.Set<T>().Where(predicate);
         }
 
-        public IQueryable<T?> GetSetAsTracking(Expression<Func<T, bool>> predicate = null)
+        public IQueryable<T?> GetSetAsTracking<T>(Expression<Func<T, bool>> predicate = null) where T : class
         {
             if (predicate == null)
             {
@@ -111,9 +110,9 @@ namespace Classifieds.Repository.Impl
             return res;
         }
 
-        public async Task<T> UpdateAsync(T entity, bool clearTracker = false)
+        public async Task<T> UpdateAsync<T>(T entity, bool clearTracker = false) where T : class
         {
-            if(entity is BaseEntity baseEntity)
+            if (entity is BaseEntity baseEntity)
             {
                 baseEntity.UpdatedAt = DateTime.UtcNow;
             }
@@ -122,9 +121,9 @@ namespace Classifieds.Repository.Impl
             return res.Entity;
         }
 
-        public async Task<int> UpdateRangeAsync(IEnumerable<T> entities, bool clearTracker = false)
-        {   
-            foreach(var entity in entities)
+        public async Task<int> UpdateRangeAsync<T>(IEnumerable<T> entities, bool clearTracker = false) where T : class
+        {
+            foreach (var entity in entities)
             {
                 if (entity is BaseEntity baseEntity)
                 {
@@ -132,7 +131,7 @@ namespace Classifieds.Repository.Impl
                 }
             }
             var res = await _context.SaveChangesAsync(clearTracker);
-            if(clearTracker)
+            if (clearTracker)
             {
                 _context.ChangeTracker.Clear();
             }
