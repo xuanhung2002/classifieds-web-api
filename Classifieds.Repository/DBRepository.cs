@@ -56,7 +56,7 @@ namespace Classifieds.Repository
 
         public async Task<T?> FindAsync<T>(Expression<Func<T, bool>> predicate) where T : class
         {
-            return await _context.Set<T>().FirstOrDefaultAsync(predicate);
+            return await _context.Set<T>().AsNoTracking().FirstOrDefaultAsync(predicate);
         }
 
         public async Task<T?> FindForUpdateAsync<T>(Expression<Func<T, bool>> predicate) where T : class
@@ -86,7 +86,7 @@ namespace Classifieds.Repository
         {
             if (predicate == null)
             {
-                return _context.Set<T>();
+                return _context.Set<T>().AsNoTracking();
             }
             return _context.Set<T>().Where(predicate);
         }
@@ -95,10 +95,12 @@ namespace Classifieds.Repository
         {
             if (predicate == null)
             {
-                return _context.Set<T>().AsTracking();
+                return _context.Set<T>();
             }
-            return _context.Set<T>().Where(predicate).AsTracking();
+            return _context.Set<T>().Where(predicate);
         }
+
+
 
         public async Task<int> SaveChangesAsync(bool clearTracker = false)
         {
@@ -110,7 +112,7 @@ namespace Classifieds.Repository
             return res;
         }
 
-        public async Task<T> UpdateAsync<T>(T entity, bool clearTracker = false) where T : class
+        public async Task<T> UpdateAsync<T>(T entity, bool clearTracker = true) where T : class
         {
             if (entity is BaseEntity baseEntity)
             {
@@ -137,6 +139,67 @@ namespace Classifieds.Repository
             }
             return res;
         }
+
+        public async Task<TableInfo<T>> GetWithPagingAsync<T>(TableQParameter<T> queryParameter) where T : class
+        {
+            TableInfo<T> result = new TableInfo<T>();
+            var internalResult = await GetWithPagingInternalAsync(queryParameter);
+            result.PageCount = internalResult.PageCount;
+            result.ItemsCount = internalResult.TotalCount;
+            result.Items = await internalResult.ItemsQuery.ToListAsync();
+            return result;
+        }
+
+        public async Task<TableInfo<R>> GetWithPagingAsync<T, R>(TableQParameter<T> queryParameter, Expression<Func<T, R>> selector) where T : class
+        {
+            TableInfo<R> result = new TableInfo<R>();
+            var internalResult = await GetWithPagingInternalAsync(queryParameter);
+            result.PageCount = internalResult.PageCount;
+            result.ItemsCount = internalResult.TotalCount;
+            result.Items = await internalResult.ItemsQuery.Select(selector).ToListAsync();
+            return result;
+        }
+        private async Task<(int PageCount, int TotalCount, IQueryable<T> ItemsQuery)> GetWithPagingInternalAsync<T>(TableQParameter<T> qParam, bool counting = true) where T : class
+        {
+            int pageCount = 0;
+            int totalCount = 0;
+            var dbSet = _context.Set<T>();
+            int skipCount = (qParam.PageIndex - 1) * qParam.PageSize;
+            IOrderedQueryable<T> data;
+            var set = qParam.Filter != null
+                ? dbSet.Where<T>(qParam.Filter) : dbSet;
+            if(qParam.Sorter.IsAscending)
+            {
+                data = set.OrderBy(qParam.Sorter.SortBy);
+            }
+            else
+            {
+                data = set.OrderByDescending(qParam.Sorter.SortBy);
+
+            }
+
+            if(counting)
+            {
+                var allCount = totalCount = await data.CountAsync();
+                if (allCount == 0)
+                {
+                    pageCount = 1;
+                }
+                else
+                {
+                    pageCount = allCount % qParam.PageSize == 0
+                        ? (allCount / qParam.PageSize)
+                        : (allCount / qParam.PageSize) + 1; ;
+                }
+            }
+
+            IQueryable<T> query = skipCount == 0 && counting
+                ? data.Take(qParam.PageSize)
+                : data.Skip(skipCount).Take(qParam.PageSize);
+                
+            return new (pageCount, totalCount, query);
+        }
+
 
     }
 }

@@ -10,7 +10,7 @@ namespace Classifieds.Data.Entities
         public string Subject { get; set; } = null!;
         public List<string> Images { get; set; } = new List<string>();
         public string? Description { get; set; }
-        public decimal Price { get; set; }
+        public decimal? Price { get; set; }
         [EnumDataType(typeof(ItemCondition))]
         public ItemCondition ItemCondition { get; set; }
         [EnumDataType(typeof(ItemStatus))]
@@ -26,6 +26,17 @@ namespace Classifieds.Data.Entities
         public Guid UserId{ get; set; }
 
         public Guid CategoryId { get; set; }
+
+        [EnumDataType(typeof(PostType))]
+        public PostType PostType { get; set; }
+
+        public DateTime? EndTime { get; set; }
+        public decimal? StartAmount { get; set; }
+        public decimal? CurrentAmount { get; set; }
+        public Guid? CurrentBidderId { get; set; }
+
+        [EnumDataType(typeof(AuctionStatus))]
+        public AuctionStatus? AuctionStatus { get; set; }
 
     }
 }

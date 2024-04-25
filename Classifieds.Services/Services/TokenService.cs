@@ -11,11 +11,9 @@ namespace Classifieds.Services.Services
 {
     public class TokenService : ITokenService
     {
-        private readonly string jwtSecretKey;
 
         public TokenService(IConfiguration configuration)
         {
-            jwtSecretKey = configuration["JwtSecretKey"] ?? string.Empty;
         }
 
         public string GenerateToken(User user)
@@ -51,7 +49,7 @@ namespace Classifieds.Services.Services
                 return null;
 
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(jwtSecretKey);
+            var key = Encoding.ASCII.GetBytes(AppSettings.JwtSecretKey);
             try
             {
                 tokenHandler.ValidateToken(token, new TokenValidationParameters

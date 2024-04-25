@@ -17,5 +17,7 @@ namespace Classifieds.Repository
         Task<int> DeleteAsync<T>(T entity, bool clearTracker = false) where T : class;
         Task<int> DeleteRangeAsync<T>(IEnumerable<T> entities, bool clearTracker = false) where T : class;
         //Task<int> SaveChangesAsync(bool clearTracker = false);
+        Task<TableInfo<T>> GetWithPagingAsync<T>(TableQParameter<T> queryParameter) where T : class;
+        Task<TableInfo<R>> GetWithPagingAsync<T, R>(TableQParameter<T> queryParameter, Expression<Func<T, R>> selector) where T : class;
     }
 }

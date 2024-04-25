@@ -5,6 +5,9 @@ namespace Classifieds.Services.IServices
 {
     public interface IPostService
     {
-        Task<Post> AddAsync(AddPostDto dto);
+        Task<PostDto> GetByIdAsync(Guid id);
+        Task<Post> AddAsync(PostAddDto dto);
+        Task<Post> UpdateAsync(PostUpdateDto dto);
+        Task<int> DeleteAsync(Guid id);
     }
 }

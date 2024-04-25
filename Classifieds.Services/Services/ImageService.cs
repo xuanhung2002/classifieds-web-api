@@ -13,22 +13,26 @@ namespace Classifieds.Services.Services
             _cloudinary = cloudinary;
         }
 
-        public ImageUploadResult? UploadFile(Stream fileStream, string fileName)
+        public async Task<ImageUploadResult?> UploadFile(Stream fileStream, string fileName)
         {
             var uploadParams = new ImageUploadParams()
             {
                 File = new FileDescription(fileName, fileStream),
             };
 
-            var uploadResult = _cloudinary.Upload(uploadParams);
+            var uploadResult = await _cloudinary.UploadAsync(uploadParams);
 
             return uploadResult;
         }
 
-        public bool DeleteFile(string publicId)
+        public async Task<bool> DeleteFile(string url)
         {
+            var lastSlashIndex = url.LastIndexOf("/");
+            var lastDotIndex = url.LastIndexOf(".");
+            var publicId = url.Substring(lastSlashIndex + 1, lastDotIndex);
+
             var deletionParams = new DeletionParams(publicId);
-            var deletionResult = _cloudinary.Destroy(deletionParams);
+            var deletionResult = await _cloudinary.DestroyAsync(deletionParams);
 
             if (deletionResult.Result == "ok")
             {
@@ -38,9 +42,9 @@ namespace Classifieds.Services.Services
             return false;
         }
 
-        public string UploadImage(Stream image)
+        public async Task<string> UploadImage(Stream image)
         {
-            var uploadResult = UploadFile(image, Guid.NewGuid().ToString());
+            var uploadResult = await UploadFile(image, Guid.NewGuid().ToString());
             return uploadResult != null ? uploadResult.Url.ToString() : string.Empty;
         }
 

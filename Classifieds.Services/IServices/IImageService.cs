@@ -9,8 +9,8 @@ namespace Classifieds.Services.IServices
 {
     public interface IImageService
     {
-        ImageUploadResult? UploadFile(Stream fileStream, string fileName);
-        bool DeleteFile(string publicId);
-        public string UploadImage(Stream stream);
+        Task<ImageUploadResult?> UploadFile(Stream fileStream, string fileName);
+        Task<bool> DeleteFile(string url);
+        Task<string> UploadImage(Stream stream);
     }
 }

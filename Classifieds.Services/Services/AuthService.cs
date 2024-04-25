@@ -47,7 +47,10 @@ namespace Classifieds.Services.Services
 
             registerDto.AccountName = registerDto.AccountName.ToLower();
             if (await _repository.FindAsync<User>(s => s.AccountName == registerDto.AccountName) is not null)
-                return false;
+            {
+                throw new Exception("Username is existed");
+            }
+                
 
             using var hashFunc = new HMACSHA256();
             var passwordBytes = Encoding.UTF8.GetBytes(registerDto.Password);
@@ -102,7 +105,7 @@ namespace Classifieds.Services.Services
             {
                 // User doesn't exist, create a new user
                 existingUser = CreateUserFromGoogleData(googleUser);
-                await _repository.AddAsync(existingUser);
+                await _repository.AddAsync(existingUser, true);
             }
             else
             {
@@ -150,7 +153,7 @@ namespace Classifieds.Services.Services
 
             user.ResetToken = await GenerateResetToken();
             user.ResetTokenExpires = DateTime.UtcNow.AddDays(1);
-            await _repository.UpdateAsync(user);
+            await _repository.UpdateAsync(user, true);
             // send email;
             await SendPasswordResetEmail(user);
         }
@@ -195,7 +198,7 @@ namespace Classifieds.Services.Services
 
         public async Task ResetPassword(ResetPasswordRequest model)
         {
-            var user = await _repository.FindAsync<User>(s => s.ResetToken == model.Token);
+            var user = await _repository.FindForUpdateAsync<User>(s => s.ResetToken == model.Token);
             using var hashFunc = new HMACSHA256();
             var passwordBytes = Encoding.UTF8.GetBytes(model.Password);
             user.PasswordHash = hashFunc.ComputeHash(passwordBytes);
@@ -203,7 +206,7 @@ namespace Classifieds.Services.Services
             user.PasswordReset = DateTime.UtcNow;
             user.ResetToken = null;
             user.ResetTokenExpires = null;
-            await _repository.UpdateAsync(user);
+            await _repository.UpdateAsync(user, true);
         }
     }
 }

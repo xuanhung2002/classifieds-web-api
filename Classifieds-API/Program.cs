@@ -31,6 +31,7 @@ builder.Services.AddJwt(configuration);
 builder.Services.AddServices();
 builder.Services.AddCloudinary(configuration);
 builder.Services.AddAutoMapper();
+builder.Services.AddCORS();
 
 var app = builder.Build();
 
@@ -56,11 +57,13 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseCors("AllowAll");
 app.UseMiddleware<ErrorHandlerMiddleware>();
 app.UseMiddleware<JwtMiddleware>();
 app.UseHttpsRedirection();
 
-app.UseAuthorization();
+//app.UseAuthentication();
+//app.UseAuthorization();
 
 app.MapControllers();
 

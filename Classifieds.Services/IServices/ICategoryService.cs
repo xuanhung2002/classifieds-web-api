@@ -7,5 +7,6 @@ namespace Classifieds.Services.IServices
     {
         Task<Category> AddAsync(AddCategoryRequest category);
         Task<int> DeleteAsync(Guid id);
+        Task<List<CategoryDto>> GetAllAsync();
     }
 }

@@ -57,9 +57,9 @@ namespace Classifieds_API.Controllers
 
         [AllowAnonymous]
         [HttpPost("reset-password")]
-        public IActionResult ResetPassword(ResetPasswordRequest model)
+        public async Task<IActionResult> ResetPassword(ResetPasswordRequest model)
         {
-            _authService.ResetPassword(model);
+            await _authService.ResetPassword(model);
             return Ok(new { message = "Password reset successful, you can now login" });
         }
     }

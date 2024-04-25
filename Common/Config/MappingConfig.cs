@@ -11,14 +11,20 @@ namespace Common.Config
         {
             var mappingConfig = new MapperConfiguration(config =>
             {
-                config.CreateMap<AddPostDto, Post>()
+
+                // post
+                config.CreateMap<PostAddDto, Post>()
                .ForMember(dest => dest.Images, opt => opt.Ignore()) // Không ánh xạ trực tiếp từ List<IFormFile> vào List<string>
                .ForMember(dest => dest.AddressJson, opt => opt.MapFrom(src => JsonConvert.SerializeObject(src.Address))); // Ánh xạ AddressJson
-
-                config.CreateMap<Post, AddPostDto>();
+                config.CreateMap<Post, PostAddDto>();
                 config.CreateMap<Post, PostDto>();
+                config.CreateMap<PostUpdateDto, Post>().ReverseMap();
 
+                // user
                 config.CreateMap<User, UserDto>();
+
+                // category
+                config.CreateMap<Category, CategoryDto>().ReverseMap();
             });
 
 

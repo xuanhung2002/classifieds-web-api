@@ -14,5 +14,9 @@
         public static string Password { get; set; }
         public static string Host { get; set; }
         public static int Port { get; set; }
+        public static string CloudName { get; set; }
+        public static string ApiKey { get; set; }
+        public static string ApiSecret { get; set; }
+        public static string CORS { get; private set; }
     }
 }

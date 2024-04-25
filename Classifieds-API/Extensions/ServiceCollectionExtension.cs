@@ -22,6 +22,7 @@ namespace Classifieds_API.Extensions
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<IImageService, ImageService>();
+            services.AddScoped<ICategoryService, CategoryService>();
             services.AddScoped<IPostService, PostService>();
             services.AddScoped<IEmailService, EmailService>();
         }
@@ -87,21 +88,33 @@ namespace Classifieds_API.Extensions
 
         public static void AddCloudinary(this IServiceCollection services, IConfiguration configuration)
         {
-            services.Configure<CloudinarySettings>(configuration.GetSection("CloudinarySettings"));
-            services.AddSingleton(x =>
-            {
-                var cloudinarySettings = x.GetRequiredService<IOptions<CloudinarySettings>>().Value;
-                return new Cloudinary(new Account(
-                    cloudinarySettings.CloudName,
-                    cloudinarySettings.ApiKey,
-                    cloudinarySettings.ApiSecret));
-            });
+            services.AddSingleton(new Cloudinary(new Account(
+                AppSettings.CloudName,
+                AppSettings.ApiKey,
+                AppSettings.ApiSecret)));
         }
 
         public static void AddAutoMapper(this IServiceCollection service)
         {
             var mapper = MappingConfig.RegisterMap().CreateMapper();
             service.AddSingleton(mapper);
+        }
+
+        public static void AddCORS(this IServiceCollection service)
+        {
+            service.AddCors(options =>
+            {
+                options.AddPolicy("AllowAll",
+                    builder =>
+                    {
+                        builder
+                            .WithOrigins(AppSettings.CORS)
+                            .AllowAnyMethod()
+                            .AllowCredentials()
+                            .AllowAnyHeader();
+                    });
+            });
+
         }
     }
 }
