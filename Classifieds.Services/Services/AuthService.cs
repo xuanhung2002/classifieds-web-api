@@ -74,7 +74,8 @@ namespace Classifieds.Services.Services
             using (HttpClient client = new HttpClient())
             {
                 // Set up the request to Google's token validation endpoint
-                var requestUri = $"https://www.googleapis.com/oauth2/v3/tokeninfo?id_token={googleToken}&client_id={AppSettings.GoogleClientId}";
+                //var requestUri = $"https://www.googleapis.com/oauth2/v3/tokeninfo?id_token={googleToken}&client_id={AppSettings.GoogleClientId}";
+                var requestUri = $"https://www.googleapis.com/oauth2/v1/userinfo?access_token={googleToken}";
 
                 var request = new HttpRequestMessage(HttpMethod.Get, requestUri);
                 // Send the request and get the response

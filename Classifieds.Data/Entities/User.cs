@@ -12,7 +12,6 @@ namespace Classifieds.Data.Entities
         public byte[] PasswordHash { get; set; } = null!;
         public byte[] PasswordSalt { get; set; } = null!;
         public string? Avatar { get; set; }
-        [EnumDataType(typeof(Role))]
         public Role Role { get; set; }
         public string? ResetToken { get; set; }
         public DateTime? ResetTokenExpires { get; set; }

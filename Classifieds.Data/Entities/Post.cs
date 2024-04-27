@@ -11,9 +11,7 @@ namespace Classifieds.Data.Entities
         public List<string> Images { get; set; } = new List<string>();
         public string? Description { get; set; }
         public decimal? Price { get; set; }
-        [EnumDataType(typeof(ItemCondition))]
         public ItemCondition ItemCondition { get; set; }
-        [EnumDataType(typeof(ItemStatus))]
         public ItemStatus Status { get; set; }
         public string AddressJson { get; set; } = null!;
         [NotMapped]
@@ -27,7 +25,6 @@ namespace Classifieds.Data.Entities
 
         public Guid CategoryId { get; set; }
 
-        [EnumDataType(typeof(PostType))]
         public PostType PostType { get; set; }
 
         public DateTime? EndTime { get; set; }
@@ -35,7 +32,6 @@ namespace Classifieds.Data.Entities
         public decimal? CurrentAmount { get; set; }
         public Guid? CurrentBidderId { get; set; }
 
-        [EnumDataType(typeof(AuctionStatus))]
         public AuctionStatus? AuctionStatus { get; set; }
 
     }

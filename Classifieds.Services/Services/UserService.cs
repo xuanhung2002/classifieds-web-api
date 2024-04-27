@@ -18,7 +18,22 @@ namespace Classifieds.Services.Services
         }
         public async Task<UserDto> GetById(Guid id)
         {
-            var user = await _repository.GetAsync<User>(s => s.Id == id);
+            var user = await _repository.FindAsync<User>(s => s.Id == id);
+            if (user == null)
+            {
+                throw new Exception("User is not existed");
+            }
+            var dto = _mapper.Map<UserDto>(user);
+            return dto;
+        }
+
+        public async Task<UserDto> GetByUsername(string username)
+        {
+            var user = await _repository.FindAsync<User>(s => s.AccountName == username);
+            if(user == null)
+            {
+                throw new Exception("User is not existed");
+            }
             var dto = _mapper.Map<UserDto>(user);
             return dto;
         }

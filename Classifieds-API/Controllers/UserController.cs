@@ -26,5 +26,11 @@ namespace Classifieds_API.Controllers
             var user = await _userService.GetById(id);
             return Ok(user);
         }
+
+        //[HttpGet("username")]
+        //public async Task<IActionResult> GetByUsername(string username)
+        //{
+
+        //}
     }
 }
