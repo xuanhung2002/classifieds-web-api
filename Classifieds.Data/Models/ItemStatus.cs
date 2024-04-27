@@ -2,7 +2,7 @@
 {
     public enum ItemStatus
     {
-        Unsold,
-        Sold
+        Unsold = 1,
+        Sold = 2
     }
 }

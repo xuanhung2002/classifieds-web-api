@@ -8,7 +8,7 @@ namespace Classifieds.Data.Models
 {
     public enum AuctionStatus
     {
-        Opening,
-        Closed
+        Opening = 1,
+        Closed = 2
     }
 }

@@ -2,7 +2,7 @@
 {
     public enum ItemCondition
     {
-        New,
-        Used
+        New = 1,
+        Used = 2
     }
 }

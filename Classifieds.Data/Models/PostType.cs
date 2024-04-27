@@ -8,7 +8,7 @@ namespace Classifieds.Data.Models
 {
     public enum PostType
     {
-        Normal,
-        Auction
+        Normal = 1,
+        Auction = 2
     }
 }
