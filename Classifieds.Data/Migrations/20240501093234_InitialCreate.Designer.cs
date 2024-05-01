@@ -12,18 +12,47 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Classifieds.Data.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20240409160521_update")]
-    partial class update
+    [Migration("20240501093234_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.2")
+                .HasAnnotation("ProductVersion", "8.0.4")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("Classifieds.Data.Entities.Bid", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("BidTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("BidderId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("PostId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Bids");
+                });
 
             modelBuilder.Entity("Classifieds.Data.Entities.Category", b =>
                 {
@@ -55,11 +84,18 @@ namespace Classifieds.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
@@ -76,11 +112,26 @@ namespace Classifieds.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("AuctionStatus")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("CategoryId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<decimal?>("CurrentAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<Guid?>("CurrentBidderId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("EndTime")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Images")
                         .IsRequired()
@@ -89,8 +140,17 @@ namespace Classifieds.Data.Migrations
                     b.Property<int>("ItemCondition")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("Price")
+                    b.Property<int>("PostType")
+                        .HasColumnType("int");
+
+                    b.Property<decimal?>("Price")
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("StartAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
 
                     b.Property<string>("Subject")
                         .IsRequired()
@@ -103,8 +163,6 @@ namespace Classifieds.Data.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Posts");
                 });
@@ -145,7 +203,6 @@ namespace Classifieds.Data.Migrations
                         .HasColumnType("varbinary(max)");
 
                     b.Property<string>("PhoneNumber")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ResetToken")
@@ -163,22 +220,6 @@ namespace Classifieds.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Users");
-                });
-
-            modelBuilder.Entity("Classifieds.Data.Entities.Post", b =>
-                {
-                    b.HasOne("Classifieds.Data.Entities.User", "User")
-                        .WithMany("Posts")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Classifieds.Data.Entities.User", b =>
-                {
-                    b.Navigation("Posts");
                 });
 #pragma warning restore 612, 618
         }

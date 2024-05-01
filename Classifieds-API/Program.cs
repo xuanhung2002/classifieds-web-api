@@ -1,4 +1,5 @@
 using Classifieds.Data;
+using Classifieds.Services.BackgroundServices;
 using Classifieds_API.Extensions;
 using Classifieds_API.Middleware;
 using Common;
@@ -32,6 +33,7 @@ builder.Services.AddServices();
 builder.Services.AddCloudinary(configuration);
 builder.Services.AddAutoMapper();
 builder.Services.AddCORS();
+builder.Services.AddHostedService<AuctionClosingService>();
 
 var app = builder.Build();
 
@@ -42,7 +44,7 @@ try
     var dataContext = serviceProvider.GetRequiredService<DataContext>();
     dataContext.Database.EnsureCreated();
     Console.WriteLine("MIGRATIONNNNNNNNNNNN");
-    Console.WriteLine("Seed category");
+    Console.WriteLine("Seed data");
     DbInitialize.Initialize(dataContext);
 }
 catch

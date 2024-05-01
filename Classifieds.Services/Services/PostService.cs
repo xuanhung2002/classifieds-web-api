@@ -38,6 +38,7 @@ namespace Classifieds.Services.Services
             }
             if(dto.PostType == PostType.Auction)
             {
+                post.Price = 0;
                 post.AuctionStatus = AuctionStatus.Opening;
             }
 
@@ -45,10 +46,20 @@ namespace Classifieds.Services.Services
 
         }
 
-        public async Task<Post> UpdateAsync(PostUpdateDto dto)
-        {
+        public async Task<Post> UpdateAsync(PostUpdateDto dto, Guid userId)
+        {   
             var post = await _repository.FindForUpdateAsync<Post>(s => s.Id == dto.Id);
-            foreach(var oldImage in post.Images)
+
+            if (post == null)
+            {
+                throw new Exception("Post is not existed");
+            }
+            if (post.UserId != userId)
+            {
+                throw new UnauthorizedAccessException("No permission in this post");
+            }
+
+            foreach (var oldImage in post.Images)
             {
                await _imageService.DeleteFile(oldImage);                    
             }
@@ -79,5 +90,61 @@ namespace Classifieds.Services.Services
             return await _repository.DeleteAsync(post);
         }
 
+        public async Task<List<PostDto>> GetAllAsync()
+        {
+            var post = await _repository.GetAsync<Post, PostDto>(s => _mapper.Map<PostDto>(s));
+            return post;
+        }
+
+        public async Task OpenAuction(OpenAuctionDto dto, Guid userId)
+        {
+            var post = await _repository.FindForUpdateAsync<Post>(s => s.Id == dto.Id);
+            if(post == null)
+            {
+                throw new Exception("Post is not existed");
+            }
+            if(post.UserId != userId)
+            {
+                throw new UnauthorizedAccessException("No permission in this post");
+            }
+
+            post.PostType = PostType.Auction;
+            post.AuctionStatus = AuctionStatus.Opening;
+            post.StartAmount = dto.StartAmount;
+
+            await _repository.UpdateAsync(post);
+        }
+
+        public async Task CloseAuction(Guid id, Guid userId)
+        {
+            var post = await _repository.FindForUpdateAsync<Post>(s => s.Id == id);
+            if (post == null)
+            {
+                throw new Exception("Post is not existed");
+            }
+            if (post.UserId != userId)
+            {
+                throw new UnauthorizedAccessException("No permission in this post");
+            }
+
+            post.PostType = PostType.Normal;
+            post.AuctionStatus = AuctionStatus.Closed;
+            post.Price = post.CurrentAmount;
+            
+            await _repository.UpdateAsync(post);
+
+        }
+
+        public async Task<TableInfo<PostDto>> GetPagingAsync(TableQParameter<Post> parameter)
+        {
+            var tableInfo = await _repository.GetWithPagingAsync(parameter);
+            var postDtos = _mapper.Map<List<PostDto>>(tableInfo.Items);
+            return new TableInfo<PostDto>
+            {
+                PageCount = tableInfo.PageCount,
+                ItemsCount = tableInfo.ItemsCount,
+                Items = postDtos
+            };
+        }
     }
 }

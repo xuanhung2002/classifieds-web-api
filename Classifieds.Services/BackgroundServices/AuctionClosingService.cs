@@ -1,48 +1,60 @@
 ﻿using Classifieds.Data;
 using Classifieds.Data.Entities;
 using Classifieds.Data.Models;
-using Classifieds.Repository;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Org.BouncyCastle.Asn1.Esf;
+using System;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Classifieds.Services.BackgroundServices
 {
     public class AuctionClosingService : BackgroundService
     {
-        //private readonly IDBRepository _repository;
-        private readonly DataContext _context;
+        private readonly IServiceProvider _serviceProvider;
 
-        public AuctionClosingService(/*IDBRepository repository,*/ DataContext context)
+        public AuctionClosingService(IServiceProvider serviceProvider)
         {
-            //_repository = repository;
-            _context = context;
+            _serviceProvider = serviceProvider;
         }
+
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-
             while (!stoppingToken.IsCancellationRequested)
             {
                 try
-                {
-                    var currentTime = DateTime.UtcNow;
-                    var nextExecutionTime = GetNextExecutionTime(currentTime); // Lấy thời điểm tiếp theo cần thực hiện kiểm tra
-
-                    // Tính thời gian cần chờ trước khi thực hiện tiếp theo
-                    var delayTime = nextExecutionTime - currentTime;
-                    await Task.Delay(delayTime, stoppingToken);
-
-                    //var autions = _repository.GetSetAsTracking<Post>(s => s.PostType == PostType.Auction && s.AuctionStatus == AuctionStatus.Opening && s.AuctionStatus == AuctionStatus.Opening && s.EndTime <= currentTime);
-                    var autions = _context.Posts.Where(s => s.PostType == PostType.Auction && s.AuctionStatus == AuctionStatus.Opening && s.AuctionStatus == AuctionStatus.Opening && s.EndTime <= currentTime);
-
-                    if (autions != null)
+                {   
+                    using( var scope = _serviceProvider.CreateScope() )
                     {
-                        foreach (var auction in autions)
+                        var dbContext = scope.ServiceProvider.GetRequiredService<DataContext>();
+
+                        var currentTime = DateTime.UtcNow;
+                        var auctionsToClose = await dbContext.Posts
+                            .Where(s => s.PostType == PostType.Auction &&
+                                        s.AuctionStatus == AuctionStatus.Opening &&
+                                        s.EndTime <= currentTime)
+                            .ToListAsync(stoppingToken);
+
+                        if (auctionsToClose.Any())
                         {
-                            auction.AuctionStatus = AuctionStatus.Closed;
-                            _context.Posts.Update(auction);
-                            //signalR
+                            foreach (var auction in auctionsToClose)
+                            {
+                                auction.AuctionStatus = AuctionStatus.Closed;
+                                dbContext.Posts.Update(auction);
+                                // Cần thêm logic để thông báo cho người dùng (ví dụ: sử dụng SignalR)
+                            }
+
+                            await dbContext.SaveChangesAsync(stoppingToken);
                         }
-                        await _context.SaveChangesAsync();
+
+                        // Đợi 30 giây trước khi kiểm tra lại
+                        await Task.Delay(TimeSpan.FromSeconds(30), stoppingToken);
                     }
+
+
                 }
                 catch (OperationCanceledException)
                 {
@@ -53,15 +65,7 @@ namespace Classifieds.Services.BackgroundServices
                 {
                     // Log and continue
                 }
-
             }
-
-        }
-
-        private DateTime GetNextExecutionTime(DateTime currentTime)
-        {
-            // Tính thời gian tiếp theo cần kiểm tra (ví dụ: mỗi phút)
-            return currentTime.AddSeconds(30);
         }
     }
 }

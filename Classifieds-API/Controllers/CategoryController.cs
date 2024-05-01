@@ -21,7 +21,7 @@ namespace Classifieds_API.Controllers
             return Ok(category);
         }
 
-        [HttpGet("categories")]
+        [HttpGet]
         public async Task<IActionResult> GetAll()
         {
             var categories = await _categoryService.GetAllAsync();
