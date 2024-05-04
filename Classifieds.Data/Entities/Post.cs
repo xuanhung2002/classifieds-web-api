@@ -21,9 +21,14 @@ namespace Classifieds.Data.Entities
             set => AddressJson = JsonConvert.SerializeObject(value);
         }
 
+        [Required]
         public Guid UserId{ get; set; }
+        public User User { get; set; }
 
+        [Required]
         public Guid CategoryId { get; set; }
+        [ForeignKey("CategoryId")]
+        public Category Category { get; set; }
 
         public PostType PostType { get; set; }
 

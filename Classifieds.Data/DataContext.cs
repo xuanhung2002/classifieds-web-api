@@ -14,6 +14,14 @@ namespace Classifieds.Data
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<Bid> Bids{ get; set; }
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Post>()
+                .HasOne(p => p.User)
+                .WithMany()
+                .HasForeignKey(p => p.UserId)
+                .OnDelete(DeleteBehavior.NoAction);
+        }
 
     }
 }
