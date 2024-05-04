@@ -10,7 +10,7 @@ namespace Classifieds.Services.IServices
         Task<TableInfo<PostDto>> GetPagingAsync(TableQParameter<Post> parameter);
         Task<PostDto> GetByIdAsync(Guid id);
         Task<Post> AddAsync(PostAddDto dto);
-        Task<Post> UpdateAsync(PostUpdateDto dto, Guid userId);
+        Task<Post> UpdateAsync(PostUpdateDto dto);
         Task<int> DeleteAsync(Guid id);
 
         Task OpenAuction(OpenAuctionDto dto, Guid userId);

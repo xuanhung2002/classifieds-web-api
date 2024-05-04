@@ -14,7 +14,6 @@ namespace Classifieds.Data.DTOs
 
         public Address Address {  get; set; } = null!;
         public Guid CategoryId { get; set; }
-        public Guid UserId { get; set; }
 
         public PostType PostType { get; set; }
 

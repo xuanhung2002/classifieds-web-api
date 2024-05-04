@@ -25,6 +25,7 @@ namespace Classifieds_API.Extensions
             services.AddScoped<ICategoryService, CategoryService>();
             services.AddScoped<IPostService, PostService>();
             services.AddScoped<IEmailService, EmailService>();
+            services.AddScoped<ICurrentUserService, CurrentUserService>();
         }
         public static void AddJwt(this IServiceCollection services, IConfiguration configuration)
         {

@@ -12,12 +12,14 @@ namespace Classifieds.Services.Services
         private readonly IDBRepository _repository;
         private readonly IMapper _mapper;
         private readonly IImageService _imageService;
+        public readonly ICurrentUserService _currentUserService;
 
-        public PostService(IDBRepository repository, IMapper mapper, IImageService imageService)
+        public PostService(IDBRepository repository, IMapper mapper, IImageService imageService, ICurrentUserService currentUserService)
         {
             _repository = repository;
             _mapper = mapper;
             _imageService = imageService;
+            _currentUserService = currentUserService;
         }
 
         public async Task<PostDto> GetByIdAsync(Guid id)
@@ -27,9 +29,14 @@ namespace Classifieds.Services.Services
         }
 
         public async Task<Post> AddAsync(PostAddDto dto)
-        {
+        {   
+            if(_currentUserService.User == null)
+            {
+                throw new UnauthorizedAccessException("Invalid token");
+            }
             var post = _mapper.Map<Post>(dto);
-            post.Status = ItemStatus.Unsold;
+            post.User = _currentUserService.User;
+            post.Status = ItemStatus.Unsold;            
             foreach(var image in dto.Images)
             {
                 using var stream = image.OpenReadStream();
@@ -46,15 +53,20 @@ namespace Classifieds.Services.Services
 
         }
 
-        public async Task<Post> UpdateAsync(PostUpdateDto dto, Guid userId)
-        {   
+        public async Task<Post> UpdateAsync(PostUpdateDto dto)
+        {
+            if (_currentUserService.User == null)
+            {
+                throw new UnauthorizedAccessException("Invalid token");
+            }
+
             var post = await _repository.FindForUpdateAsync<Post>(s => s.Id == dto.Id);
 
             if (post == null)
             {
                 throw new Exception("Post is not existed");
             }
-            if (post.UserId != userId)
+            if (post.User != _currentUserService.User)
             {
                 throw new UnauthorizedAccessException("No permission in this post");
             }

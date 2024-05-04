@@ -1,9 +1,11 @@
-using Classifieds.Data;
+﻿using Classifieds.Data;
 using Classifieds.Services.BackgroundServices;
+using Classifieds.Services.SignalR;
 using Classifieds_API.Extensions;
 using Classifieds_API.Middleware;
 using Common;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 var builder = WebApplication.CreateBuilder(args);
 IConfiguration configuration = builder.Configuration;
@@ -26,14 +28,15 @@ builder.Services.AddDbContext<DataContext>(
     dbContextOptions => dbContextOptions.UseSqlServer(AppSettings.ConnectionStrings)
 );
 
-
 builder.Services.AddSwagger();
 builder.Services.AddJwt(configuration);
 builder.Services.AddServices();
 builder.Services.AddCloudinary(configuration);
 builder.Services.AddAutoMapper();
 builder.Services.AddCORS();
+builder.Services.AddSignalR();
 builder.Services.AddHostedService<AuctionClosingService>();
+builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
 
@@ -59,6 +62,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseRouting();
+
 app.UseCors("AllowAll");
 app.UseMiddleware<ErrorHandlerMiddleware>();
 app.UseMiddleware<JwtMiddleware>();
@@ -66,6 +71,9 @@ app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.MapHub<AuctionHub>("/auctionHub");
+app.MapHub<ChatHub>("/chatHub");
 
 app.MapControllers();
 

@@ -22,20 +22,30 @@ namespace Classifieds.Services.BackgroundServices
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
-        {
+       {
             while (!stoppingToken.IsCancellationRequested)
             {
                 try
-                {   
-                    using( var scope = _serviceProvider.CreateScope() )
+                {
+                    using (var scope = _serviceProvider.CreateScope())
                     {
                         var dbContext = scope.ServiceProvider.GetRequiredService<DataContext>();
 
                         var currentTime = DateTime.UtcNow;
+                        Console.WriteLine("Execute auto closing, current time =>> " + currentTime);
+
+                        // Tính toán thời gian cho phút tiếp theo
+                        var nextMinute = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, currentTime.Hour, currentTime.Minute + 1, 0);
+
+                        // Tính thời gian chờ để bắt đầu từ phút tiếp theo
+                        var delayTime = nextMinute - currentTime;
+                        await Task.Delay(delayTime, stoppingToken);
+
+                        // Thực hiện công việc kiểm tra và đóng các cuộc đấu giá
                         var auctionsToClose = await dbContext.Posts
                             .Where(s => s.PostType == PostType.Auction &&
                                         s.AuctionStatus == AuctionStatus.Opening &&
-                                        s.EndTime <= currentTime)
+                                        s.EndTime <= nextMinute)
                             .ToListAsync(stoppingToken);
 
                         if (auctionsToClose.Any())
@@ -49,12 +59,7 @@ namespace Classifieds.Services.BackgroundServices
 
                             await dbContext.SaveChangesAsync(stoppingToken);
                         }
-
-                        // Đợi 30 giây trước khi kiểm tra lại
-                        await Task.Delay(TimeSpan.FromSeconds(30), stoppingToken);
                     }
-
-
                 }
                 catch (OperationCanceledException)
                 {

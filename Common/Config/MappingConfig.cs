@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Classifieds.Data.DTOs;
+using Classifieds.Data.DTOs.WatchListDtos;
 using Classifieds.Data.Entities;
 using Newtonsoft.Json;
 
@@ -25,6 +26,10 @@ namespace Common.Config
 
                 // category
                 config.CreateMap<Category, CategoryDto>().ReverseMap();
+
+                //watch list
+                config.CreateMap<AddWatchPostDto, WatchList>();
+                
             });
 
 

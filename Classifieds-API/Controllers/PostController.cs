@@ -48,7 +48,6 @@ namespace Classifieds_API.Controllers
         [Authorize(Role.User, Role.Admin)]
         public async Task<IActionResult> Create(PostAddDto dto)
         {
-            dto.UserId = User.Id;
             await _postService.AddAsync(dto);
             return Ok();
         }
@@ -57,7 +56,7 @@ namespace Classifieds_API.Controllers
         [Authorize(Role.User, Role.Admin)]
         public async Task<IActionResult> Update(PostUpdateDto dto)
         {
-            await _postService.UpdateAsync(dto, User.Id);
+            await _postService.UpdateAsync(dto);
             return Ok();
         }
 
