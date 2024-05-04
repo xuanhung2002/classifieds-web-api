@@ -20,7 +20,8 @@ namespace Classifieds_API.Middleware
             if (accountId != null)
             {
                 // attach account to context on successful jwt validation
-                context.Items["User"] = await dataContext.Users.FindAsync(accountId.Value);
+                var user = await dataContext.Users.FindAsync(accountId.Value);
+                context.Items["User"] = user;
             }
 
             await _next(context);

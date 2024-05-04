@@ -42,11 +42,7 @@ namespace Classifieds_API.Extensions
                   };
               });
 
-            services.AddAuthorization(options =>
-            {
-                //options.AddPolicy("RequireAdminRole", policy =>
-                //    policy.RequireRole(Roles.Admin.ToString()));               
-            });
+            services.AddAuthorization();
         }
 
 

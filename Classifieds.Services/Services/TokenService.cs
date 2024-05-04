@@ -27,12 +27,12 @@ namespace Classifieds.Services.Services
 
             };
             //var symmetricKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecretKey));
-            var symmetricKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(AppSettings.JwtSecretKey));
+            var symmetricKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(AppSettings.JwtSecretKey));
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims),
-                Expires = DateTime.Now.AddDays(1),
+                Expires = DateTime.UtcNow.AddDays(1),
                 SigningCredentials = new(symmetricKey, SecurityAlgorithms.HmacSha256Signature)
             };
 
@@ -58,6 +58,7 @@ namespace Classifieds.Services.Services
                     IssuerSigningKey = new SymmetricSecurityKey(key),
                     ValidateIssuer = false,
                     ValidateAudience = false,
+                    RequireExpirationTime = false,
                     // set clockskew to zero so tokens expire exactly at token expiration time (instead of 5 minutes later)
                     ClockSkew = TimeSpan.Zero
                 }, out SecurityToken validatedToken);
