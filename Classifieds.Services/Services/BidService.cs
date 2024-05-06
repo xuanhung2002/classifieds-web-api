@@ -1,5 +1,6 @@
 ﻿using Classifieds.Data.DTOs.BidDtos;
 using Classifieds.Data.Entities;
+using Classifieds.Data.Enums;
 using Classifieds.Repository;
 using Classifieds.Services.IServices;
 
@@ -20,7 +21,7 @@ namespace Classifieds.Services.Services
             {
                 throw new Exception("Post is not existed");
             }
-            if(post.AuctionStatus == Data.Models.AuctionStatus.Closed)
+            if(post.AuctionStatus == AuctionStatus.Closed)
             {
                 throw new Exception("Post's auction is closed");
             }

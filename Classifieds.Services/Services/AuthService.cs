@@ -2,7 +2,7 @@
 using Classifieds.Data.DTOs.GoogleAuthDtos;
 using Classifieds.Data.DTOs.UserDtos;
 using Classifieds.Data.Entities;
-using Classifieds.Data.Models;
+using Classifieds.Data.Enums;
 using Classifieds.Repository;
 using Classifieds.Services.IServices;
 using Common;
@@ -150,7 +150,10 @@ namespace Classifieds.Services.Services
         public async Task ForgotPassword(ForgotPasswordRequest model)
         {
             var user = await _repository.FindForUpdateAsync<User>(s => s.Email == model.Email);
-            if (user == null) return;
+            if (user == null)
+            {
+                throw new Exception("User not found");
+            };
 
             user.ResetToken = await GenerateResetToken();
             user.ResetTokenExpires = DateTime.UtcNow.AddDays(1);
@@ -200,14 +203,19 @@ namespace Classifieds.Services.Services
         public async Task ResetPassword(ResetPasswordRequest model)
         {
             var user = await _repository.FindForUpdateAsync<User>(s => s.ResetToken == model.Token);
+            if( user == null)
+            {
+                throw new Exception("Invalid reset token");
+            }
             using var hashFunc = new HMACSHA256();
             var passwordBytes = Encoding.UTF8.GetBytes(model.Password);
-            user.PasswordHash = hashFunc.ComputeHash(passwordBytes);
+            var newPasswordHash = hashFunc.ComputeHash(passwordBytes);
+            user.PasswordHash = newPasswordHash;
             user.PasswordSalt = hashFunc.Key;
             user.PasswordReset = DateTime.UtcNow;
             user.ResetToken = null;
             user.ResetTokenExpires = null;
-            await _repository.UpdateAsync(user, true);
+            await _repository.UpdateAsync(user);       
         }
     }
 }

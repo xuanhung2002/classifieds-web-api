@@ -1,5 +1,5 @@
 ﻿using Classifieds.Data.DTOs.BidDtos;
-using Classifieds.Data.Models;
+using Classifieds.Data.Enums;
 using Classifieds.Services.IServices;
 using Classifieds.Services.Services;
 using Classifieds_API.Authorization;

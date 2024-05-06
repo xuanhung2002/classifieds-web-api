@@ -1,4 +1,4 @@
-﻿namespace Classifieds.Data.Models
+﻿namespace Classifieds.Data.Enums
 {
     public enum Role
     {

@@ -7,7 +7,7 @@ namespace Classifieds.Services.IServices
     public interface IPostService
     {
         Task<List<PostDto>> GetAllAsync();
-        Task<TableInfo<PostDto>> GetPagingAsync(TableQParameter<Post> parameter);
+        Task<TableInfo<PostDto>> GetPagingAsync(TablePageParameter parameter);
         Task<PostDto> GetByIdAsync(Guid id);
         Task<Post> AddAsync(PostAddDto dto);
         Task<Post> UpdateAsync(PostUpdateDto dto);

@@ -1,4 +1,5 @@
-﻿using Classifieds.Data.Models;
+﻿using Classifieds.Data.Enums;
+using Classifieds.Data.Models;
 using Microsoft.AspNetCore.Http;
 using System.ComponentModel.DataAnnotations;
 

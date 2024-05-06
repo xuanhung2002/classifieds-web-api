@@ -1,5 +1,5 @@
 ﻿using Classifieds.Data.Entities;
-using Classifieds.Data.Models;
+using Classifieds.Data.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;

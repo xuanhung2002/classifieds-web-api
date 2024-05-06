@@ -1,4 +1,5 @@
-﻿using Classifieds.Data.Models;
+﻿using Classifieds.Data.Enums;
+using Classifieds.Data.Models;
 using System.ComponentModel.DataAnnotations;
 
 namespace Classifieds.Data.DTOs

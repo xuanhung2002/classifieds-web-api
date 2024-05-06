@@ -4,11 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Classifieds.Data.Models
+namespace Classifieds.Data.Enums
 {
-    public enum AuctionStatus
+    public enum SortedKey
     {
-        Opening = 1,
-        Closed = 2
     }
 }

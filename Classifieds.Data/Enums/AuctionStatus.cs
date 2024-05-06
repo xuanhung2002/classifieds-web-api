@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Classifieds.Data.Models
+namespace Classifieds.Data.Enums
 {
-    public enum PostType
+    public enum AuctionStatus
     {
-        Normal = 1,
-        Auction = 2
+        Opening = 1,
+        Closed = 2
     }
 }

@@ -1,7 +1,7 @@
 ﻿using Classifieds.Data;
 using Classifieds.Data.DTOs.UserDtos;
 using Classifieds.Data.Entities;
-using Classifieds.Data.Models;
+using Classifieds.Data.Enums;
 using System.Security.Cryptography;
 using System.Text;
 using static System.Net.WebRequestMethods;

@@ -1,4 +1,5 @@
-﻿using Classifieds.Data.Models;
+﻿using Classifieds.Data.Enums;
+using Classifieds.Data.Models;
 using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;

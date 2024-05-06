@@ -1,6 +1,6 @@
 ﻿using Classifieds.Data;
 using Classifieds.Data.Entities;
-using Classifieds.Data.Models;
+using Classifieds.Data.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;

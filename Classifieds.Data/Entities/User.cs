@@ -1,8 +1,8 @@
-﻿using Classifieds.Data.Models;
+﻿using Classifieds.Data.Enums;
 using System.ComponentModel.DataAnnotations;
 
 namespace Classifieds.Data.Entities
-{   
+{
     public class User : BaseEntity
     {
         public string Name { get; set; } = null!;

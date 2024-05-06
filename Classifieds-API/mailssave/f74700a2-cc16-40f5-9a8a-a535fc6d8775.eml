@@ -1,0 +1,11 @@
+From: Classifieds System <classifieds.system@outlook.com>
+Date: Tue, 07 May 2024 00:21:28 +0700
+Subject: Sign-up Verification API - Reset Password
+Message-Id: <SQIDA76JZMU4.G316D46GS8I21@desktop-7mjg1me>
+Sender: Classifieds System <classifieds.system@outlook.com>
+To: xuanhung09052002@gmail.com
+MIME-Version: 1.0
+Content-Type: text/html; charset=utf-8
+
+<p>Please use the below token to reset your password with the <code>/accounts/reset-password</code> api route:</p>
+                            <p><code>2D2997213C86E65D9ED37327D2771A884345243C4A66CE839C9CE5B101A3BE360569691501DD45D49039A208D46B5B22531A9F662038190DF628829AAB822EA7</code></p>

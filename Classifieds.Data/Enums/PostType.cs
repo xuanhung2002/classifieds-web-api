@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Classifieds.Data.Models
+namespace Classifieds.Data.Enums
 {
-    public enum WatchType
+    public enum PostType
     {
-        Interested = 1,
-        Bidding = 2,
+        Normal = 1,
+        Auction = 2
     }
 }

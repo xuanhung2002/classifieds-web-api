@@ -67,7 +67,7 @@ namespace Classifieds.Services.SignalR
 
                 Console.WriteLine("User connected");
                 var userId = _currentUserService.User.Id;
-                //var watchList = await _watchListService.GetListAuctionIdsByUserIDAsync(userId);
+                var watchList = await _watchListService.GetPostIdsByUserId(userId);
 
                 var userConnection = Users.GetOrAdd(
                         accountId,
@@ -79,10 +79,10 @@ namespace Classifieds.Services.SignalR
                     userConnection.ConnectionIds.Add(Context.ConnectionId);
                 }
 
-                //foreach (var post in watchList)
-                //{
-                //    await Groups.AddToGroupAsync(Context.ConnectionId, post);
-                //}
+                foreach (var postId in watchList)
+                {
+                    await Groups.AddToGroupAsync(Context.ConnectionId, postId.ToString());
+                }
 
                 await base.OnConnectedAsync();
             }
@@ -117,11 +117,11 @@ namespace Classifieds.Services.SignalR
                     userConnection.ConnectionIds.Remove(connectionId);
                 }
 
-                //var watchList = await _watchListService.GetListPostIdsByUserIDAsync(userId);
-                //foreach (var postId in watchList)
-                //{
-                //    await Groups.RemoveFromGroupAsync(connectionId, postId);
-                //}
+                var watchList = await _watchListService.GetPostIdsByUserId(userId);
+                foreach (var postId in watchList)
+                {
+                    await Groups.RemoveFromGroupAsync(connectionId, postId.ToString());
+                }
 
                 await base.OnDisconnectedAsync(exception);
             }

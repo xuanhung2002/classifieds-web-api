@@ -1,4 +1,4 @@
-﻿using Classifieds.Data.Models;
+﻿using Classifieds.Data.Enums;
 using Classifieds.Services.IServices;
 using Microsoft.AspNetCore.Mvc;
 
