@@ -1,4 +1,5 @@
 ﻿using Classifieds.Data.DTOs;
+using Classifieds.Data.DTOs.PostDTOs;
 using Classifieds.Data.Entities;
 using Classifieds.Data.Enums;
 using Classifieds.Repository;
@@ -29,9 +30,9 @@ namespace Classifieds_API.Controllers
 
         [HttpPost("paging")]
         [AllowAnonymous]
-        public async Task<IActionResult> GetPaging(TablePageParameter parameter)
+        public async Task<IActionResult> GetPaging(PostPagingRequest request)
         {
-            var res = await _postService.GetPagingAsync(parameter);
+            var res = await _postService.GetPagingAsync(request);
             return Ok(res);
         }
 

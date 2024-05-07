@@ -1,5 +1,8 @@
-﻿using Classifieds.Data.Enums;
+﻿using AutoMapper;
+using Classifieds.Data.DTOs;
+using Classifieds.Data.Enums;
 using Classifieds.Services.IServices;
+using Classifieds_API.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Classifieds_API.Controllers
@@ -9,10 +12,12 @@ namespace Classifieds_API.Controllers
     public class UserController : BaseController
     {
         private IUserService _userService;
+        private readonly IMapper _mapper;
 
-        public UserController(IUserService userService)
+        public UserController(IUserService userService, IMapper mapper)
         {
             _userService = userService;
+            _mapper = mapper;
         }
 
 
@@ -27,10 +32,22 @@ namespace Classifieds_API.Controllers
             return Ok(user);
         }
 
-        //[HttpGet("username")]
-        //public async Task<IActionResult> GetByUsername(string username)
-        //{
+        [HttpGet]
+        [Authorize]
+        public IActionResult GetCurrentUser()
+        {
+            if (User != null)
+            {
+                var user = _mapper.Map<UserDto>(User);
+                return Ok(user);
+            }
+            else
+            {
 
-        //}
+                return Unauthorized("Invalid token");
+            }
+
+
+        }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Classifieds.Data.DTOs;
+using Classifieds.Data.DTOs.PostDTOs;
 using Classifieds.Data.Entities;
 using Classifieds.Data.Enums;
 using Classifieds.Repository;
@@ -149,18 +150,18 @@ namespace Classifieds.Services.Services
 
         }
 
-        public async Task<TableInfo<PostDto>> GetPagingAsync(TablePageParameter parameter)
+        public async Task<TableInfo<PostDto>> GetPagingAsync(PostPagingRequest request)
         {
             int pageCount = 0;
             int totalCount = 0;
 
             var data = _repository.GetSet<Post>();
-            int skipCount = (parameter.PageIndex - 1) * parameter.PageSize;
+            int skipCount = (request.Parameter.PageIndex - 1) * request.Parameter.PageSize;
             IOrderedQueryable<Post> posts;
-            if (parameter.SortKey != null)
+            if (request.Parameter.SortKey != null)
             {
-                Expression<Func<Post, object>> orderByExpression = p => EF.Property<object>(p, parameter.SortKey);
-                if (parameter.IsAccending)
+                Expression<Func<Post, object>> orderByExpression = p => EF.Property<object>(p, request.Parameter.SortKey);
+                if (request.Parameter.IsAccending)
                 {
                     posts = data.OrderBy(orderByExpression);
                 }
@@ -183,20 +184,37 @@ namespace Classifieds.Services.Services
             }
             else
             {
-                pageCount = allCount % parameter.PageSize == 0
-                    ? (allCount / parameter.PageSize)
-                    : (allCount / parameter.PageSize) + 1; ;
+                pageCount = allCount % request.Parameter.PageSize == 0
+                    ? (allCount / request.Parameter.PageSize)
+                    : (allCount / request.Parameter.PageSize) + 1; ;
             }
 
             IQueryable<Post> query = skipCount == 0
-                ? posts.Take(parameter.PageSize)
-                : posts.Skip(skipCount).Take(parameter.PageSize);
+                ? posts.Take(request.Parameter.PageSize)
+                : posts.Skip(skipCount).Take(request.Parameter.PageSize);
 
-            if (parameter.SearchContent != null)
+            if (request.Parameter.SearchContent != null)
             {
-                Expression<Func<Post, bool>> searchExpression = p => p.Subject.Contains(parameter.SearchContent);
+                Expression<Func<Post, bool>> searchExpression = p => p.Subject.Contains(request.Parameter.SearchContent);
 
                 query = query.Where(searchExpression);
+            }
+
+            if (!string.IsNullOrEmpty(request.Address?.Province))
+            {
+
+                posts = (IOrderedQueryable<Post>)posts.Where(p => p.Address.Province == request.Address.Province);
+            }
+
+            if (!string.IsNullOrEmpty(request.Address?.District))
+            {
+
+                posts = (IOrderedQueryable<Post>)posts.Where(p => p.Address.District == request.Address.District);
+            }
+
+            if (!string.IsNullOrEmpty(request.Address?.Ward))
+            {
+                posts = (IOrderedQueryable<Post>)posts.Where(p => p.Address.Ward == request.Address.Ward);
             }
             var postDtos = _mapper.Map<List<PostDto>>(query);
             return new TableInfo<PostDto>

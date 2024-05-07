@@ -1,4 +1,5 @@
 ﻿using Classifieds.Data.DTOs;
+using Classifieds.Data.DTOs.PostDTOs;
 using Classifieds.Data.Entities;
 using Classifieds.Repository;
 
@@ -7,7 +8,7 @@ namespace Classifieds.Services.IServices
     public interface IPostService
     {
         Task<List<PostDto>> GetAllAsync();
-        Task<TableInfo<PostDto>> GetPagingAsync(TablePageParameter parameter);
+        Task<TableInfo<PostDto>> GetPagingAsync(PostPagingRequest request);
         Task<PostDto> GetByIdAsync(Guid id);
         Task<Post> AddAsync(PostAddDto dto);
         Task<Post> UpdateAsync(PostUpdateDto dto);
