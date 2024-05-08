@@ -47,9 +47,9 @@ namespace Classifieds_API.Controllers
 
         [HttpPost]
         [Authorize(Role.User, Role.Admin)]
-        public async Task<IActionResult> Create(PostAddDto dto)
+        public async Task<IActionResult> Create([FromForm]PostAddDto request)
         {
-            await _postService.AddAsync(dto);
+            await _postService.AddAsync(request);
             return Ok();
         }
 
