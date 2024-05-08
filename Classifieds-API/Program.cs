@@ -45,7 +45,7 @@ var serviceProvider = scope.ServiceProvider;
 try
 {
     var dataContext = serviceProvider.GetRequiredService<DataContext>();
-    dataContext.Database.EnsureCreated();
+    dataContext.Database.Migrate();
     Console.WriteLine("MIGRATIONNNNNNNNNNNN");
     Console.WriteLine("Seed data");
     DbInitialize.Initialize(dataContext);

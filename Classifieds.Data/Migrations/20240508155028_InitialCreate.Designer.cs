@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Classifieds.Data.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20240504063900_InitialCreate")]
+    [Migration("20240508155028_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -95,6 +95,9 @@ namespace Classifieds.Data.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<bool>("Seen")
+                        .HasColumnType("bit");
+
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
 
@@ -102,6 +105,8 @@ namespace Classifieds.Data.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Notifications");
                 });
@@ -230,6 +235,36 @@ namespace Classifieds.Data.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("Classifieds.Data.Entities.WatchList", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("PostId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("WatchType")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PostId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("WatchLists");
+                });
+
             modelBuilder.Entity("Classifieds.Data.Entities.Bid", b =>
                 {
                     b.HasOne("Classifieds.Data.Entities.User", "User")
@@ -249,6 +284,17 @@ namespace Classifieds.Data.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Classifieds.Data.Entities.Notification", b =>
+                {
+                    b.HasOne("Classifieds.Data.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Classifieds.Data.Entities.Post", b =>
                 {
                     b.HasOne("Classifieds.Data.Entities.Category", "Category")
@@ -264,6 +310,25 @@ namespace Classifieds.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Category");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Classifieds.Data.Entities.WatchList", b =>
+                {
+                    b.HasOne("Classifieds.Data.Entities.Post", "Post")
+                        .WithMany()
+                        .HasForeignKey("PostId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Classifieds.Data.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Post");
 
                     b.Navigation("User");
                 });

@@ -29,7 +29,7 @@ public class TableParameter
 {
     public string SortKey { get; set; } = string.Empty;
     public bool IsAccending { get; set; }
-    public string SearchContent { get; set; }
+    public string? SearchContent { get; set; } = null;
 }
 
 public class TablePageParameter : TableParameter

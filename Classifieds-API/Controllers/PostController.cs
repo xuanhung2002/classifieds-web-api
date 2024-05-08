@@ -30,7 +30,7 @@ namespace Classifieds_API.Controllers
 
         [HttpPost("paging")]
         [AllowAnonymous]
-        public async Task<IActionResult> GetPaging(PostPagingRequest request)
+        public async Task<IActionResult> GetPaging([FromForm]PostPagingRequest request)
         {
             var res = await _postService.GetPagingAsync(request);
             return Ok(res);
