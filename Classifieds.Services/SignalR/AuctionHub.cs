@@ -42,7 +42,7 @@ namespace Classifieds.Services.SignalR
                 var httpContext = Context.GetHttpContext();
                 var configuration = httpContext.RequestServices.GetService<IConfiguration>();
                 var token = httpContext.Request.Query["access_token"].ToString();
-                Console.WriteLine(token);
+                Console.WriteLine("token", token);
                 var tmp = Context.ConnectionId;
                 if (string.IsNullOrEmpty(token))
                 {
@@ -201,7 +201,24 @@ namespace Classifieds.Services.SignalR
 
         public async Task UpdatePriceAsync(Guid postId, decimal price)
         {
-            await Clients.Group($"Auction-{postId}").SendAsync("BidPlaced", postId, price);
+            await Clients.Group($"Post-{postId}").SendAsync("BidPlaced", postId, price);
+        }
+
+
+        public async Task StartAuction(string auctionId)
+        {
+            // Phát sự kiện bắt đầu đấu giá đến tất cả các client
+            await Clients.All.SendAsync("AuctionStarted", auctionId);
+        }
+
+        public async Task PlaceBid(Guid postId, decimal amount)
+        {   
+            if(_currentUserService.User == null)
+            {
+                throw new UnauthorizedAccessException("Invalid token");
+            }
+            //logic
+            await Clients.All.SendAsync("BidPlace", postId, _currentUserService.User.Name, amount);
         }
     }
 }

@@ -27,6 +27,14 @@ namespace Classifieds.Services.Services
         public async Task AddWatchPost(AddWatchPostDto dto)
         {
             var watchPost = _mapper.Map<WatchList>(dto);
+            var watchOfUser = await GetPostIdsByUserId(watchPost.UserId);
+            if(watchOfUser != null)
+            {
+                if (watchOfUser.Contains(watchPost.Id))
+                {
+                    throw new Exception("You has already watched this post");
+                }
+            }
             await _repository.AddAsync(watchPost);
         }
 

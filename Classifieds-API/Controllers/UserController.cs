@@ -24,10 +24,10 @@ namespace Classifieds_API.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(Guid id)
         {
-            if (id != User.Id && User.Role != Role.Admin)
-            {
-                return Unauthorized(new { message = "Unauthorize" });
-            }
+            //if (id != User.Id && User.Role != Role.Admin)
+            //{
+            //    return Unauthorized(new { message = "Unauthorize" });
+            //}
             var user = await _userService.GetById(id);
             return Ok(user);
         }

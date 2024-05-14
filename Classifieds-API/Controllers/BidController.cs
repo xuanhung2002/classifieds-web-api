@@ -23,8 +23,14 @@ namespace Classifieds_API.Controllers
         [Authorize(Role.User, Role.Admin)]
         public async Task<IActionResult> CreateBid(CreateBidRequest request)
         {
-            await _bidService.CreateBidAsync(request, User.Id);
-            return Ok();
+            var res = await _bidService.CreateBidAsync(request, User.Id);
+            return Ok(res);
+        }
+        [HttpGet("{postId}")]
+        public async Task<IActionResult> GetBidsOfPost(Guid postId)
+        {
+            var res = await _bidService.GetBidsOfPost(postId);
+            return Ok(res);
         }
 
     }

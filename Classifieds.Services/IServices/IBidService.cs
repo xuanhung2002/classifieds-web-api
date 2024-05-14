@@ -9,6 +9,7 @@ namespace Classifieds.Services.IServices
 {
     public interface IBidService
     {
-        Task CreateBidAsync(CreateBidRequest request, Guid userId);
+        Task<BidDto?> CreateBidAsync(CreateBidRequest request, Guid userId);
+        Task<List<BidDto>> GetBidsOfPost(Guid postId);
     }
 }
