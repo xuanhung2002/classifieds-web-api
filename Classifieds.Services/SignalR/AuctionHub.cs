@@ -1,4 +1,5 @@
-﻿using Classifieds.Services.IServices;
+﻿using Classifieds.Data.DTOs.BidDtos;
+using Classifieds.Services.IServices;
 using Classifieds.Services.Services;
 using Common;
 using Microsoft.AspNetCore.Http;
@@ -27,12 +28,17 @@ namespace Classifieds.Services.SignalR
         private readonly IHubContext<AuctionHub> _hubContext;
         private readonly IWatchListService _watchListService;
         private readonly ICurrentUserService _currentUserService;
+        private readonly IPostService _postService;
+        private readonly IUserService _userService;
         public static readonly ConcurrentDictionary<Guid?, HubUser> Users = new();
 
-        public AuctionHub(IWatchListService watchListService, IHubContext<AuctionHub> hubContext)
+        public AuctionHub(IWatchListService watchListService, IHubContext<AuctionHub> hubContext, ICurrentUserService currentUserService, IPostService postService, IUserService userService)
         {
             _watchListService = watchListService;
             _hubContext = hubContext;
+            _currentUserService = currentUserService;
+            _postService = postService;
+            _userService = userService;
         }
 
         public override async Task OnConnectedAsync()
@@ -66,8 +72,9 @@ namespace Classifieds.Services.SignalR
                 var accountId = Guid.Parse(jwtToken.Claims.First(x => x.Type == JwtRegisteredClaimNames.NameId).Value);
 
                 Console.WriteLine("User connected");
-                var userId = _currentUserService.User.Id;
-                var watchList = await _watchListService.GetPostIdsByUserId(userId);
+                var userId = _userService.GetById(accountId);
+                //var watchList = await _watchListService.GetPostIdsByUserId(userId);
+                var watchList = (await _postService.GetAllAsync()).Select(s => s.Id).ToList();
 
                 var userConnection = Users.GetOrAdd(
                         accountId,
@@ -117,7 +124,8 @@ namespace Classifieds.Services.SignalR
                     userConnection.ConnectionIds.Remove(connectionId);
                 }
 
-                var watchList = await _watchListService.GetPostIdsByUserId(userId);
+                //var watchList = await _watchListService.GetPostIdsByUserId(userId);
+                var watchList = (await _postService.GetAllAsync()).Select(s => s.Id).ToList();
                 foreach (var postId in watchList)
                 {
                     await Groups.RemoveFromGroupAsync(connectionId, postId.ToString());
@@ -210,15 +218,11 @@ namespace Classifieds.Services.SignalR
             // Phát sự kiện bắt đầu đấu giá đến tất cả các client
             await Clients.All.SendAsync("AuctionStarted", auctionId);
         }
-
-        public async Task PlaceBid(Guid postId, decimal amount)
-        {   
-            if(_currentUserService.User == null)
-            {
-                throw new UnauthorizedAccessException("Invalid token");
-            }
-            //logic
-            await Clients.All.SendAsync("BidPlace", postId, _currentUserService.User.Name, amount);
+        public async Task ClosedAuction(string auctionId)
+        {
+            // Phát sự kiện bắt đầu đấu giá đến tất cả các client
+            await Clients.All.SendAsync("AuctionClosed", auctionId);
         }
+
     }
 }

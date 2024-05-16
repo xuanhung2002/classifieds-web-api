@@ -5,7 +5,6 @@ using Classifieds_API.Extensions;
 using Classifieds_API.Middleware;
 using Common;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);

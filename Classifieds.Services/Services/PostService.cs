@@ -6,6 +6,7 @@ using Classifieds.Data.Enums;
 using Classifieds.Repository;
 using Classifieds.Services.IServices;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using System.Linq.Expressions;
 
 namespace Classifieds.Services.Services
@@ -158,10 +159,10 @@ namespace Classifieds.Services.Services
             var data = _repository.GetSet<Post>();
             int skipCount = (request.Parameter.PageIndex - 1) * request.Parameter.PageSize;
             IOrderedQueryable<Post> posts;
-            if (request.Parameter.SortKey != null)
+            if (!request.Parameter.SortKey.IsNullOrEmpty())
             {
                 Expression<Func<Post, object>> orderByExpression = p => EF.Property<object>(p, request.Parameter.SortKey);
-                if (request.Parameter.IsAccending)
+                if (Convert.ToBoolean(request.Parameter.IsAccending))
                 {
                     posts = data.OrderBy(orderByExpression);
                 }

@@ -1,6 +1,7 @@
 ﻿using Classifieds.Repository;
 using Classifieds.Services.IServices;
 using Classifieds.Services.Services;
+using Classifieds.Services.SignalR;
 using CloudinaryDotNet;
 using Common;
 using Common.Config;
@@ -28,6 +29,7 @@ namespace Classifieds_API.Extensions
             services.AddScoped<ICurrentUserService, CurrentUserService>();
             services.AddScoped<IBidService, BidService>();
             services.AddScoped<IWatchListService, WatchListService>();
+            services.AddScoped<AuctionHub>();
         }
         public static void AddJwt(this IServiceCollection services, IConfiguration configuration)
         {

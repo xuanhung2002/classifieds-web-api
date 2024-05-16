@@ -4,6 +4,8 @@ using Classifieds.Data.Entities;
 using Classifieds.Data.Enums;
 using Classifieds.Repository;
 using Classifieds.Services.IServices;
+using Classifieds.Services.SignalR;
+using Microsoft.AspNetCore.SignalR;
 
 namespace Classifieds.Services.Services
 {
@@ -11,11 +13,13 @@ namespace Classifieds.Services.Services
     {
         private readonly IDBRepository _repository;
         private readonly IMapper _mapper;
+        private readonly IHubContext<AuctionHub> _auctionHub;
 
-        public BidService(IDBRepository repository, IMapper mapper)
+        public BidService(IDBRepository repository, IMapper mapper, IHubContext<AuctionHub> auctionHub)
         {
             _repository = repository;
             _mapper = mapper;
+            _auctionHub = auctionHub;
         }
         public async Task<BidDto?> CreateBidAsync(CreateBidRequest request, Guid userId)
         {
@@ -40,9 +44,12 @@ namespace Classifieds.Services.Services
             post.CurrentBidderId = userId;
             var entity = await _repository.AddAsync(bid);
             await _repository.UpdateAsync(post);
-            if(entity != null)
+            
+            if (entity != null)
             {
-                return _mapper.Map<BidDto>(entity);
+                var dto = _mapper.Map<BidDto>(entity);
+                await _auctionHub.Clients.All.SendAsync("PlaceBid", dto);
+                return dto;
             }
             else
             {
@@ -52,7 +59,26 @@ namespace Classifieds.Services.Services
 
         public async Task<List<BidDto>> GetBidsOfPost(Guid postId)
         {
-            var bids = await _repository.GetAsync<Bid, BidDto>(s => _mapper.Map<BidDto>(s),s => s.PostId == postId); 
+            var bids = await _repository.GetAsync<Bid, BidDto>(s => new BidDto
+            {
+                PostId = s.PostId,
+                Amount= s.Amount,
+                User = new Data.DTOs.UserDto
+                {
+                    Id = s.User.Id,
+                    AccountName = s.User.AccountName,
+                    Email = s.User.Email,
+                    Avatar = s.User.Avatar,
+                    CreatedAt = s.User.CreatedAt,
+                    PhoneNumber = s.User.PhoneNumber,
+                    Name = s.User.Name, 
+                }
+                
+            } ,s => s.PostId == postId);
+            if(bids != null)
+            {
+                bids = bids.OrderByDescending(b => b.Amount).ToList();
+            }
             return bids;
 
         }
