@@ -12,10 +12,12 @@ namespace Classifieds_API.Controllers
     public class AuthController : BaseController
     {
         private readonly IAuthService _authService;
+        private readonly ILogger<AuthController> _logger;
 
-        public AuthController(IAuthService authService)
+        public AuthController(IAuthService authService, ILogger<AuthController> logger)
         {
             _authService = authService;
+            _logger = logger;
         }
 
         [AllowAnonymous]
@@ -27,7 +29,7 @@ namespace Classifieds_API.Controllers
             {
                 return Unauthorized("Login failed");
             }
-
+            _logger.LogInformation($"{loginDto.AccountName} logged in");
             return Ok(token);
         }
 
