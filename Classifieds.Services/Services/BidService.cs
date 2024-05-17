@@ -48,7 +48,7 @@ namespace Classifieds.Services.Services
             if (entity != null)
             {
                 var dto = _mapper.Map<BidDto>(entity);
-                await _auctionHub.Clients.All.SendAsync("PlaceBid", dto);
+                await _auctionHub.Clients.All.SendAsync("BidPlaced", dto);
                 return dto;
             }
             else
