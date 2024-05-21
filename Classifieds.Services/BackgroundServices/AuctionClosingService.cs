@@ -1,6 +1,7 @@
 ﻿using Classifieds.Data;
 using Classifieds.Data.Entities;
 using Classifieds.Data.Enums;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -15,10 +16,12 @@ namespace Classifieds.Services.BackgroundServices
     public class AuctionClosingService : BackgroundService
     {
         private readonly IServiceProvider _serviceProvider;
+        private readonly IHubContext<AuctionHub> _auctionHub;
 
-        public AuctionClosingService(IServiceProvider serviceProvider)
+        public AuctionClosingService(IServiceProvider serviceProvider, IHubContext<AuctionHub> auctionHub)
         {
             _serviceProvider = serviceProvider;
+            _auctionHub = auctionHub;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -54,7 +57,7 @@ namespace Classifieds.Services.BackgroundServices
                             {
                                 auction.AuctionStatus = AuctionStatus.Closed;
                                 dbContext.Posts.Update(auction);
-                                // Cần thêm logic để thông báo cho người dùng (ví dụ: sử dụng SignalR)
+                                await _auctionHub.Clients.Group($"Post-{auction.Id}").SendAsync("AuctionClosed", "Closed auction");
                             }
 
                             await dbContext.SaveChangesAsync(stoppingToken);
