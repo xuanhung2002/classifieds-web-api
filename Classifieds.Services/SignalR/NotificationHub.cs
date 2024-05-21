@@ -4,5 +4,6 @@ namespace Classifieds.Services.SignalR
 {
     public class NotificationHub : Hub
     {
+
     }
 }

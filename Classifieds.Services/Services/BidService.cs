@@ -40,6 +40,10 @@ namespace Classifieds.Services.Services
                 Amount = request.Amount,
                 BidTime = DateTime.UtcNow
             };
+            if(post.CurrentAmount >= request.Amount)
+            {
+                throw new Exception("Can't bid with the value less than current value");
+            }
             post.CurrentAmount = bid.Amount;
             post.CurrentBidderId = userId;
             var entity = await _repository.AddAsync(bid);
@@ -48,7 +52,7 @@ namespace Classifieds.Services.Services
             if (entity != null)
             {
                 var dto = _mapper.Map<BidDto>(entity);
-                await _auctionHub.Clients.All.SendAsync("BidPlaced", dto);
+                await _auctionHub.Clients.Group($"Post-{post.Id}").SendAsync("BidPlaced", dto);
                 return dto;
             }
             else
@@ -77,7 +81,7 @@ namespace Classifieds.Services.Services
             } ,s => s.PostId == postId);
             if(bids != null)
             {
-                bids = bids.OrderByDescending(b => b.Amount).ToList();
+                bids = bids.OrderByDescending(b => b.Amount).Take(10).ToList();
             }
             return bids;
 
