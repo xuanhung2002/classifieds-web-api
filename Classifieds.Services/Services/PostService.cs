@@ -153,77 +153,67 @@ namespace Classifieds.Services.Services
 
         public async Task<TableInfo<PostDto>> GetPagingAsync(PostPagingRequest request)
         {
-            int pageCount = 0;
-            int totalCount = 0;
-
             var data = _repository.GetSet<Post>();
-            int skipCount = (request.Parameter.PageIndex - 1) * request.Parameter.PageSize;
+
+            // Apply sorting
             IOrderedQueryable<Post> posts;
             if (!request.Parameter.SortKey.IsNullOrEmpty())
             {
                 Expression<Func<Post, object>> orderByExpression = p => EF.Property<object>(p, request.Parameter.SortKey);
-                if (Convert.ToBoolean(request.Parameter.IsAccending))
-                {
-                    posts = data.OrderBy(orderByExpression);
-                }
-                else
-                {
-                    posts = data.OrderByDescending(orderByExpression);
-                }
+                posts = Convert.ToBoolean(request.Parameter.IsAccending) ? data.OrderBy(orderByExpression) : data.OrderByDescending(orderByExpression);
             }
             else
             {
                 posts = data.OrderBy(s => s.CreatedAt);
             }
 
-
-
-            var allCount = totalCount = await posts.CountAsync();
-            if (allCount == 0)
-            {
-                pageCount = 1;
-            }
-            else
-            {
-                pageCount = allCount % request.Parameter.PageSize == 0
-                    ? (allCount / request.Parameter.PageSize)
-                    : (allCount / request.Parameter.PageSize) + 1; ;
-            }
-
-            IQueryable<Post> query = skipCount == 0
-                ? posts.Take(request.Parameter.PageSize)
-                : posts.Skip(skipCount).Take(request.Parameter.PageSize);
-
+            // Apply search filter
             if (request.Parameter.SearchContent != null)
             {
                 Expression<Func<Post, bool>> searchExpression = p => p.Subject.Contains(request.Parameter.SearchContent);
-
-                query = query.Where(searchExpression);
+                posts = (IOrderedQueryable<Post>)posts.Where(searchExpression);
             }
 
+            // Retrieve all filtered and sorted data from the database
+            var postList = await posts.ToListAsync();
+
+            // Apply client-side filtering based on Address
             if (!string.IsNullOrEmpty(request.Address?.Province))
             {
-
-                posts = (IOrderedQueryable<Post>)posts.Where(p => p.Address.Province == request.Address.Province);
+                postList = postList.Where(p => p.Address?.Province == request.Address.Province).ToList();
             }
 
             if (!string.IsNullOrEmpty(request.Address?.District))
             {
-
-                posts = (IOrderedQueryable<Post>)posts.Where(p => p.Address.District == request.Address.District);
+                postList = postList.Where(p => p.Address?.District == request.Address.District).ToList();
             }
 
             if (!string.IsNullOrEmpty(request.Address?.Ward))
             {
-                posts = (IOrderedQueryable<Post>)posts.Where(p => p.Address.Ward == request.Address.Ward);
+                postList = postList.Where(p => p.Address?.Ward == request.Address.Ward).ToList();
             }
-            var postDtos = _mapper.Map<List<PostDto>>(query);
+
+            // Calculate total count after all filters are applied
+            int totalCount = postList.Count;
+
+            // Apply paging
+            int skipCount = (request.Parameter.PageIndex - 1) * request.Parameter.PageSize;
+            var pagedPostList = postList.Skip(skipCount).Take(request.Parameter.PageSize).ToList();
+
+            // Calculate page count
+            int pageCount = (int)Math.Ceiling(totalCount / (double)request.Parameter.PageSize);
+
+            var postDtos = _mapper.Map<List<PostDto>>(pagedPostList);
+
             return new TableInfo<PostDto>
             {
                 PageCount = pageCount,
-                ItemsCount = allCount,
+                ItemsCount = totalCount,
                 Items = postDtos
             };
         }
+
+
+
     }
 }
