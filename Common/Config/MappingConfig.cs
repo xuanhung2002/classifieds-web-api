@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Classifieds.Data.DTOs;
 using Classifieds.Data.DTOs.BidDtos;
+using Classifieds.Data.DTOs.NotificationDtos;
 using Classifieds.Data.DTOs.WatchListDtos;
 using Classifieds.Data.Entities;
 using Newtonsoft.Json;
@@ -46,6 +47,10 @@ namespace Common.Config
                         Avatar = src.User.Avatar,
                         Role = src.User.Role
                     }));
+
+                // notification
+                config.CreateMap<NotificationAddResquest, Notification>();
+                config.CreateMap<Notification, NotificationDto>().ReverseMap();
 
             });
 

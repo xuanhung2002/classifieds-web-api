@@ -27,5 +27,11 @@ namespace Classifieds_API.Controllers
             var categories = await _categoryService.GetAllAsync();
             return Ok(categories);
         }
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(Guid id)
+        {
+            var category = await _categoryService.GetByIdAsync(id);
+            return Ok(category);
+        }
     }
 }

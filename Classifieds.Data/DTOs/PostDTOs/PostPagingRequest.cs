@@ -1,4 +1,5 @@
-﻿using Classifieds.Data.Models;
+﻿using Classifieds.Data.Enums;
+using Classifieds.Data.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,5 +12,7 @@ namespace Classifieds.Data.DTOs.PostDTOs
     {
         public TablePageParameter Parameter { get; set; }
         public Address? Address { get; set; }
+        public Guid? CategoryId { get; set; }
+        public PostType? PostType { get; set; }
     }
 }

@@ -77,6 +77,7 @@ app.UseAuthorization();
 
 app.MapHub<AuctionHub>("/auctionHub");
 app.MapHub<ChatHub>("/chatHub");
+app.MapHub<NotificationHub>("/notificationHub");
 
 app.MapControllers();
 

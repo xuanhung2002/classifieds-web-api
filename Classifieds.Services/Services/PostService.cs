@@ -6,6 +6,7 @@ using Classifieds.Data.Enums;
 using Classifieds.Repository;
 using Classifieds.Services.IServices;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using System.Linq.Expressions;
 
@@ -17,13 +18,15 @@ namespace Classifieds.Services.Services
         private readonly IMapper _mapper;
         private readonly IImageService _imageService;
         public readonly ICurrentUserService _currentUserService;
+        public readonly ILogger<PostService> _logger;
 
-        public PostService(IDBRepository repository, IMapper mapper, IImageService imageService, ICurrentUserService currentUserService)
+        public PostService(IDBRepository repository, IMapper mapper, IImageService imageService, ICurrentUserService currentUserService, ILogger<PostService> logger)
         {
             _repository = repository;
             _mapper = mapper;
             _imageService = imageService;
             _currentUserService = currentUserService;
+            _logger = logger;
         }
 
         public async Task<PostDto> GetByIdAsync(Guid id)
@@ -48,12 +51,19 @@ namespace Classifieds.Services.Services
                 post.Images.Add(url);
             }
             if (dto.PostType == PostType.Auction)
-            {
+            {   
+                if(dto.EndTime <= DateTime.UtcNow)
+                {
+                    throw new InvalidDataException("End time cannot ealier than now");
+                }
                 post.Price = 0;
                 post.AuctionStatus = AuctionStatus.Opening;
+
             }
 
-            return await _repository.AddAsync(post);
+            var entity = await _repository.AddAsync(post);
+            _logger.LogInformation($"Add post: post id: {entity.Id}");
+            return entity;
 
         }
 
@@ -172,6 +182,15 @@ namespace Classifieds.Services.Services
             {
                 Expression<Func<Post, bool>> searchExpression = p => p.Subject.Contains(request.Parameter.SearchContent);
                 posts = (IOrderedQueryable<Post>)posts.Where(searchExpression);
+            }
+
+            if(request.CategoryId != null)
+            {
+                posts = (IOrderedQueryable<Post>)posts.Where(p => p.CategoryId == request.CategoryId);
+            }
+            if(request.PostType != null)
+            {
+                posts = (IOrderedQueryable<Post>)posts.Where(p => p.PostType == request.PostType);
             }
 
             // Retrieve all filtered and sorted data from the database

@@ -43,8 +43,8 @@ namespace Classifieds.Services.BackgroundServices
                         // Tính thời gian chờ để bắt đầu từ phút tiếp theo
                         var delayTime = nextMinute - currentTime;
                         await Task.Delay(delayTime, stoppingToken);
-
-                        // Thực hiện công việc kiểm tra và đóng các cuộc đấu giá
+                        
+                        // process
                         var auctionsToClose = await dbContext.Posts
                             .Where(s => s.PostType == PostType.Auction &&
                                         s.AuctionStatus == AuctionStatus.Opening &&
@@ -57,7 +57,7 @@ namespace Classifieds.Services.BackgroundServices
                             {
                                 auction.AuctionStatus = AuctionStatus.Closed;
                                 dbContext.Posts.Update(auction);
-                                await _auctionHub.Clients.Group($"Post-{auction.Id}").SendAsync("AuctionClosed", "Closed auction");
+                                await _auctionHub.Clients.Group($"Post-{auction.Id}").SendAsync("AuctionClosed");
                             }
 
                             await dbContext.SaveChangesAsync(stoppingToken);

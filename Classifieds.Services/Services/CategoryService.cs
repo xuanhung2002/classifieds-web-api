@@ -41,5 +41,18 @@ namespace Classifieds.Services.Services
             var entity = _repository.FindAsync<Category>(s => s.Id == id);
             return await _repository.DeleteAsync(entity);
         }
+
+        public async Task<CategoryDto> GetByIdAsync(Guid id)
+        {
+            var entity = await _repository.FindAsync<Category>(s => s.Id == id);
+            if(entity != null)
+            {
+                return _mapper.Map<CategoryDto>(entity);
+            }
+            else
+            {
+                throw new InvalidDataException("Category is not existed");
+            }
+        }
     }
 }
