@@ -85,7 +85,7 @@ namespace Classifieds_API.Controllers
             return Ok();
         }
 
-        [HttpPut("close-auction")]
+        [HttpPut("close-auction/{id}")]
         [Authorize(Role.User, Role.Admin)]
         public async Task<IActionResult> CloseAuction(Guid id)
         {

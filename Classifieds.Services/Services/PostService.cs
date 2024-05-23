@@ -5,6 +5,7 @@ using Classifieds.Data.Entities;
 using Classifieds.Data.Enums;
 using Classifieds.Repository;
 using Classifieds.Services.IServices;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
@@ -19,14 +20,16 @@ namespace Classifieds.Services.Services
         private readonly IImageService _imageService;
         public readonly ICurrentUserService _currentUserService;
         public readonly ILogger<PostService> _logger;
+        private readonly IHubContext<AuctionHub> _hubContext;
 
-        public PostService(IDBRepository repository, IMapper mapper, IImageService imageService, ICurrentUserService currentUserService, ILogger<PostService> logger)
+        public PostService(IDBRepository repository, IMapper mapper, IImageService imageService, ICurrentUserService currentUserService, ILogger<PostService> logger, IHubContext<AuctionHub> hubContext)
         {
             _repository = repository;
             _mapper = mapper;
             _imageService = imageService;
             _currentUserService = currentUserService;
             _logger = logger;
+            _hubContext = hubContext;
         }
 
         public async Task<PostDto> GetByIdAsync(Guid id)
@@ -40,6 +43,14 @@ namespace Classifieds.Services.Services
             if (_currentUserService.User == null)
             {
                 throw new UnauthorizedAccessException("Invalid token");
+            }
+            if(dto.PostType == PostType.Normal && dto.Price < 0)
+            {
+                throw new Exception("The amount must bigger than 0");
+            }
+            if (dto.PostType == PostType.Auction && dto.StartAmount < 0)
+            {
+                throw new Exception("The start amount must bigger than 0");
             }
             var post = _mapper.Map<Post>(dto);
             post.User = _currentUserService.User;
@@ -148,16 +159,20 @@ namespace Classifieds.Services.Services
             {
                 throw new Exception("Post is not existed");
             }
+            if(post.PostType != PostType.Auction)
+            {
+                throw new Exception("Post is not auction post");
+            }
             if (post.UserId != userId)
             {
                 throw new UnauthorizedAccessException("No permission in this post");
             }
 
-            post.PostType = PostType.Normal;
             post.AuctionStatus = AuctionStatus.Closed;
             post.Price = post.CurrentAmount;
 
             await _repository.UpdateAsync(post);
+            await _hubContext.Clients.Group($"Post-{id}").SendAsync("AuctionClosed");
 
         }
 
