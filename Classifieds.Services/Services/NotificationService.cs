@@ -41,5 +41,15 @@ namespace Classifieds.Services.Services
                 throw new Exception("Notification is not existed");
             }
         }
+
+        public async Task<List<NotificationDto>> GetByUserIdAsync(Guid userId)
+        {
+            var notification = await _repository.GetAsync<Notification>(s => s.UserId == userId);
+            if(notification != null)
+            {
+                return _mapper.Map<List<NotificationDto>>(notification);
+            }
+            return null;
+        }
     }
 }

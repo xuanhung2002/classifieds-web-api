@@ -10,5 +10,6 @@ namespace Classifieds.Data.DTOs
     {
         public Guid Id { get; set; }
         public decimal StartAmount { get; set; }
+        public DateTime? EndTime { get; set; }
     }
 }

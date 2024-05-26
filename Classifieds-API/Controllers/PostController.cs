@@ -84,6 +84,13 @@ namespace Classifieds_API.Controllers
             await _postService.OpenAuction(model, User.Id);
             return Ok();
         }
+        [HttpPut("reopen-auction")]
+        [Authorize(Role.User, Role.Admin)]
+        public async Task<IActionResult> ReOpenAuction(OpenAuctionDto model)
+        {
+            await _postService.ReOpenAuction(model, User.Id);
+            return Ok();
+        }
 
         [HttpPut("close-auction/{id}")]
         [Authorize(Role.User, Role.Admin)]

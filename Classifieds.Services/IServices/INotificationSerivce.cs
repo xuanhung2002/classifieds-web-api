@@ -9,7 +9,8 @@ using System.Threading.Tasks;
 namespace Classifieds.Services.IServices
 {
     public interface INotificationSerivce
-    {
+    {   
+        Task<List<NotificationDto>> GetByUserIdAsync(Guid userId);
         Task<Notification?> AddAsync(NotificationAddResquest dto);
         Task MarkSeen(Guid id);
     }

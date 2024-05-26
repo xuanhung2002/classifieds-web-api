@@ -1,10 +1,12 @@
 ﻿using AutoMapper;
 using Classifieds.Data.DTOs;
+using Classifieds.Data.DTOs.NotificationDtos;
 using Classifieds.Data.DTOs.PostDTOs;
 using Classifieds.Data.Entities;
 using Classifieds.Data.Enums;
 using Classifieds.Repository;
 using Classifieds.Services.IServices;
+using Classifieds.Services.SignalR;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -21,8 +23,16 @@ namespace Classifieds.Services.Services
         public readonly ICurrentUserService _currentUserService;
         public readonly ILogger<PostService> _logger;
         private readonly IHubContext<AuctionHub> _hubContext;
+        private readonly IHubContext<NotificationHub> _notificationHubContext;
+        private readonly INotificationSerivce _notificationSerivce;
 
-        public PostService(IDBRepository repository, IMapper mapper, IImageService imageService, ICurrentUserService currentUserService, ILogger<PostService> logger, IHubContext<AuctionHub> hubContext)
+        public PostService(IDBRepository repository,
+            IMapper mapper, IImageService imageService,
+            ICurrentUserService currentUserService,
+            ILogger<PostService> logger,
+            IHubContext<AuctionHub> hubContext,
+            IHubContext<NotificationHub> notificationHubContext,
+            INotificationSerivce notificationSerivce)
         {
             _repository = repository;
             _mapper = mapper;
@@ -30,6 +40,8 @@ namespace Classifieds.Services.Services
             _currentUserService = currentUserService;
             _logger = logger;
             _hubContext = hubContext;
+            _notificationHubContext = notificationHubContext;
+            _notificationSerivce = notificationSerivce;
         }
 
         public async Task<PostDto> GetByIdAsync(Guid id)
@@ -148,8 +160,37 @@ namespace Classifieds.Services.Services
             post.PostType = PostType.Auction;
             post.AuctionStatus = AuctionStatus.Opening;
             post.StartAmount = dto.StartAmount;
+            post.EndTime = dto.EndTime;
 
             await _repository.UpdateAsync(post);
+        }
+        public async Task ReOpenAuction(OpenAuctionDto dto, Guid userId)
+        {
+            var post = await _repository.FindForUpdateAsync<Post>(s => s.Id == dto.Id);
+            if (post == null)
+            {
+                throw new Exception("Post is not existed");
+            }
+            if (post.UserId != userId)
+            {
+                throw new UnauthorizedAccessException("No permission in this post");
+            }
+
+            var bidsOfPost = await _repository.GetAsync<Bid>(s => s.PostId == post.Id);
+            if (bidsOfPost != null)
+            {
+                await _repository.DeleteRangeAsync(bidsOfPost);
+                _logger.LogInformation($"Delete all bids of post: {post.Id}");
+            }
+
+            post.PostType = PostType.Auction;
+            post.AuctionStatus = AuctionStatus.Opening;
+            post.StartAmount = dto.StartAmount;
+            post.CurrentAmount = null;
+            post.EndTime = dto.EndTime;
+
+            await _repository.UpdateAsync(post);
+            _logger.LogInformation($"Update post: {post.Id}");
         }
 
         public async Task CloseAuction(Guid id, Guid userId)
@@ -170,10 +211,19 @@ namespace Classifieds.Services.Services
 
             post.AuctionStatus = AuctionStatus.Closed;
             post.Price = post.CurrentAmount;
-
-            await _repository.UpdateAsync(post);
+            var entity = await _repository.UpdateAsync(post);
             await _hubContext.Clients.Group($"Post-{id}").SendAsync("AuctionClosed");
-
+            if(entity != null && entity.CurrentBidderId != null)
+            {
+                var notification = await _notificationSerivce.AddAsync(new NotificationAddResquest
+                {
+                    UserId = (Guid)entity.CurrentBidderId,
+                    Content = $"You win in auction {post.Id} : {post.Subject}",
+                    Seen = false
+                });
+                await _notificationHubContext.Clients.Group($"User-{entity.CurrentBidderId}").SendAsync("WinAuction", _mapper.Map<NotificationDto>(notification));
+            }
+          
         }
 
         public async Task<TableInfo<PostDto>> GetPagingAsync(PostPagingRequest request)

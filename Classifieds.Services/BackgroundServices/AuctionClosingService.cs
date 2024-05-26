@@ -1,6 +1,8 @@
 ﻿using Classifieds.Data;
 using Classifieds.Data.Entities;
 using Classifieds.Data.Enums;
+using Classifieds.Repository;
+using Classifieds.Services.IServices;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -32,7 +34,7 @@ namespace Classifieds.Services.BackgroundServices
                 {
                     using (var scope = _serviceProvider.CreateScope())
                     {
-                        var dbContext = scope.ServiceProvider.GetRequiredService<DataContext>();
+                        //var dbContext = scope.ServiceProvider.GetRequiredService<DataContext>();
 
                         var currentTime = DateTime.UtcNow;
                         Console.WriteLine("Execute auto closing, current time =>> " + currentTime);
@@ -43,24 +45,30 @@ namespace Classifieds.Services.BackgroundServices
                         // Tính thời gian chờ để bắt đầu từ phút tiếp theo
                         var delayTime = nextMinute - currentTime;
                         await Task.Delay(delayTime, stoppingToken);
-                        
+
                         // process
-                        var auctionsToClose = await dbContext.Posts
-                            .Where(s => s.PostType == PostType.Auction &&
+
+                        //var auctionsToClose = await dbContext.Posts
+                        //    .Where(s => s.PostType == PostType.Auction &&
+                        //                s.AuctionStatus == AuctionStatus.Opening &&
+                        //                s.EndTime <= nextMinute)
+                        //.ToListAsync(stoppingToken);
+                        var auctionsToClose = await scope.ServiceProvider.GetRequiredService<IDBRepository>().GetAsync<Post>(s => s.PostType == PostType.Auction &&
                                         s.AuctionStatus == AuctionStatus.Opening &&
-                                        s.EndTime <= nextMinute)
-                            .ToListAsync(stoppingToken);
+                                        s.EndTime <= nextMinute);
+                            //.Where(s => s.PostType == PostType.Auction &&
+                            //            s.AuctionStatus == AuctionStatus.Opening &&
+                            //            s.EndTime <= nextMinute)
+                            //.ToListAsync(stoppingToken);
 
                         if (auctionsToClose.Any())
                         {
                             foreach (var auction in auctionsToClose)
                             {
                                 auction.AuctionStatus = AuctionStatus.Closed;
-                                dbContext.Posts.Update(auction);
+                                await scope.ServiceProvider.GetRequiredService<IPostService>().CloseAuction(auction.Id, auction.UserId);
                                 await _auctionHub.Clients.Group($"Post-{auction.Id}").SendAsync("AuctionClosed");
                             }
-
-                            await dbContext.SaveChangesAsync(stoppingToken);
                         }
                     }
                 }
