@@ -1,4 +1,6 @@
-﻿using Classifieds.Services.IServices;
+﻿using Classifieds.Data.Enums;
+using Classifieds.Services.IServices;
+using Classifieds_API.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -15,10 +17,11 @@ namespace Classifieds_API.Controllers
             _notificationSerivce = notificationSerivce;
         }
 
-        [HttpGet("{userId}")]
-        public async Task<IActionResult> GetByUserId(Guid userId)
+        [HttpGet]
+        [Authorize(Role.User, Role.Admin)]
+        public async Task<IActionResult> GetByUserId()
         {
-            var res = await _notificationSerivce.GetByUserIdAsync(userId);
+            var res = await _notificationSerivce.GetByUserIdAsync(User.Id);
             if (res.IsNullOrEmpty())
             {
                 return StatusCode(StatusCodes.Status204NoContent, "No notification");

@@ -25,6 +25,7 @@ namespace Classifieds.Services.Services
         private readonly IHubContext<AuctionHub> _hubContext;
         private readonly IHubContext<NotificationHub> _notificationHubContext;
         private readonly INotificationSerivce _notificationSerivce;
+        private readonly IEmailService _emailService;
 
         public PostService(IDBRepository repository,
             IMapper mapper, IImageService imageService,
@@ -32,7 +33,8 @@ namespace Classifieds.Services.Services
             ILogger<PostService> logger,
             IHubContext<AuctionHub> hubContext,
             IHubContext<NotificationHub> notificationHubContext,
-            INotificationSerivce notificationSerivce)
+            INotificationSerivce notificationSerivce,
+            IEmailService emailService)
         {
             _repository = repository;
             _mapper = mapper;
@@ -42,6 +44,7 @@ namespace Classifieds.Services.Services
             _hubContext = hubContext;
             _notificationHubContext = notificationHubContext;
             _notificationSerivce = notificationSerivce;
+            _emailService = emailService;
         }
 
         public async Task<PostDto> GetByIdAsync(Guid id)
@@ -67,12 +70,15 @@ namespace Classifieds.Services.Services
             var post = _mapper.Map<Post>(dto);
             post.User = _currentUserService.User;
             post.Status = ItemStatus.Unsold;
-            foreach (var image in dto.Images)
+            var uploadTasks = dto.Images.Select(async image =>
             {
                 using var stream = image.OpenReadStream();
                 var url = await _imageService.UploadImage(stream);
-                post.Images.Add(url);
-            }
+                return url;
+            }).ToList();
+            var urls = await Task.WhenAll(uploadTasks);
+            post.Images.AddRange(urls);
+
             if (dto.PostType == PostType.Auction)
             {   
                 if(dto.EndTime <= DateTime.UtcNow)
@@ -110,7 +116,7 @@ namespace Classifieds.Services.Services
 
             foreach (var oldImage in post.Images)
             {
-                await _imageService.DeleteFile(oldImage);
+                _imageService.DeleteFile(oldImage);
             }
             post.Images.Clear();
             foreach (var image in dto.Images)
@@ -156,6 +162,10 @@ namespace Classifieds.Services.Services
             {
                 throw new UnauthorizedAccessException("No permission in this post");
             }
+            if(post.Status == ItemStatus.Sold)
+            {
+                throw new Exception("This item has been sold, can't open auction");
+            }
 
             post.PostType = PostType.Auction;
             post.AuctionStatus = AuctionStatus.Opening;
@@ -174,6 +184,10 @@ namespace Classifieds.Services.Services
             if (post.UserId != userId)
             {
                 throw new UnauthorizedAccessException("No permission in this post");
+            }
+            if (post.Status == ItemStatus.Sold)
+            {
+                throw new Exception("This item has been sold, can't open auction");
             }
 
             var bidsOfPost = await _repository.GetAsync<Bid>(s => s.PostId == post.Id);
@@ -222,8 +236,24 @@ namespace Classifieds.Services.Services
                     Seen = false
                 });
                 await _notificationHubContext.Clients.Group($"User-{entity.CurrentBidderId}").SendAsync("WinAuction", _mapper.Map<NotificationDto>(notification));
+
+
+                var winnerUser = await _repository.FindAsync<User>(s => s.Id == entity.CurrentBidderId);
+                
+                var message =
+                    $@"<p>You wil in auction for item: {entity.Subject}</p>
+                            <p>Contact to post owner to have a deal</p>";
+
+
+                _emailService.Send(
+                    to: winnerUser.Email,
+                    subject: "Classifieds - Win the auction",
+                    html: message
+                );
             }
-          
+
+            
+
         }
 
         public async Task<TableInfo<PostDto>> GetPagingAsync(PostPagingRequest request)
@@ -297,7 +327,34 @@ namespace Classifieds.Services.Services
             };
         }
 
+        public async Task MarkSold(Guid id)
+        {
+            var currentUser = _currentUserService.User; 
+            var post = await _repository.FindForUpdateAsync<Post>(s =>  s.Id == id);
+            if (post == null)
+            {
+                throw new Exception("Post is null");
+            }
+            if (currentUser != null && post.UserId == currentUser.Id)
+            {
+                post.Status = ItemStatus.Sold;
+            }
+            else
+            {
+                throw new UnauthorizedAccessException("Unauthorize");
+            }
 
-
+            if(post.PostType == PostType.Auction && post.AuctionStatus == AuctionStatus.Opening)
+            {
+                post.AuctionStatus = AuctionStatus.Closed;
+                var bids = await _repository.GetAsync<Bid>(s => s.PostId == post.Id);
+                if(bids != null)
+                {
+                    _repository.DeleteRangeAsync(bids);
+                }
+            }
+            await _repository.UpdateAsync(post);
+            _logger.LogInformation($"Update post: {post.Id}, mark SOLD");
+        }
     }
 }

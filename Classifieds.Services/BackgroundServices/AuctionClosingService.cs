@@ -67,7 +67,6 @@ namespace Classifieds.Services.BackgroundServices
                             {
                                 auction.AuctionStatus = AuctionStatus.Closed;
                                 await scope.ServiceProvider.GetRequiredService<IPostService>().CloseAuction(auction.Id, auction.UserId);
-                                await _auctionHub.Clients.Group($"Post-{auction.Id}").SendAsync("AuctionClosed");
                             }
                         }
                     }

@@ -17,5 +17,6 @@ namespace Classifieds.Services.IServices
         Task OpenAuction(OpenAuctionDto dto, Guid userId);
         Task ReOpenAuction(OpenAuctionDto dto, Guid userId);
         Task CloseAuction(Guid id, Guid userId);
+        Task MarkSold(Guid id);
     }
 }

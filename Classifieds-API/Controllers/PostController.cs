@@ -99,5 +99,13 @@ namespace Classifieds_API.Controllers
             await _postService.CloseAuction(id, User.Id);
             return Ok();
         }
+
+        [HttpPut("mark-sold/{id}")]
+        [Authorize(Role.User, Role.Admin)]
+        public async Task<IActionResult> MarkSold(Guid id)
+        {
+            await _postService.MarkSold(id);
+            return Ok();
+        }
     }
 }

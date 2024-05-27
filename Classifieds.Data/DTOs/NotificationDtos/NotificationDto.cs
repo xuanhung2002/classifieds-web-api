@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Classifieds.Data.DTOs.NotificationDtos
 {
-    public class NotificationDto
+    public class NotificationDto : BaseDto
     {
         public string Content { get; set; }
         public UserDto User { get; set; }

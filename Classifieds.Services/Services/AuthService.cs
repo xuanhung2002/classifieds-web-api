@@ -176,10 +176,10 @@ namespace Classifieds.Services.Services
 
         private async Task SendPasswordResetEmail(User user/*, string origin*/)
         {
-            var directory = Directory.GetParent(Directory.GetCurrentDirectory()).FullName;
-            var filePath = Path.Combine(directory, "Common/HtmlEmails/PasswordReset.html");
-            string message = await System.IO.File.ReadAllTextAsync(filePath);
-            message = message.Replace("[[name]]", user.Email);
+            //var directory = Directory.GetParent(Directory.GetCurrentDirectory()).FullName;
+            //var filePath = Path.Combine(directory, "Common/HtmlEmails/PasswordReset.html");
+            //string message = await System.IO.File.ReadAllTextAsync(filePath);
+            //message = message.Replace("[[name]]", user.Email);
 
             //if (!string.IsNullOrEmpty(origin))
             //{
@@ -187,13 +187,12 @@ namespace Classifieds.Services.Services
             //    message = message.Replace("[[link]]", resetUrl);
             //}
             //else
-            {
-                message =
-                    $@"<p>Please use the below token to reset your password with the <code>/accounts/reset-password</code> api route:</p>
+            var message =
+                    $@"<p>Please use the below token to reset your password with the <code>/resetpassword</code> api route:</p>
                             <p><code>{user.ResetToken}</code></p>";
-            }
 
-            await _emailService.Send(
+
+            _emailService.Send(
                 to: user.Email,
                 subject: "Sign-up Verification API - Reset Password",
                 html: message
