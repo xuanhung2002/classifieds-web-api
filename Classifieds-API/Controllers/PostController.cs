@@ -30,7 +30,7 @@ namespace Classifieds_API.Controllers
 
         [HttpPost("paging")]
         [AllowAnonymous]
-        public async Task<IActionResult> GetPaging([FromForm]PostPagingRequest request)
+        public async Task<IActionResult> GetPaging([FromForm] PostPagingRequest request)
         {
             var res = await _postService.GetPagingAsync(request);
             return Ok(res);
@@ -47,7 +47,7 @@ namespace Classifieds_API.Controllers
 
         [HttpPost]
         [Authorize(Role.User, Role.Admin)]
-        public async Task<IActionResult> Create([FromForm]PostAddDto request)
+        public async Task<IActionResult> Create([FromForm] PostAddDto request)
         {
             await _postService.AddAsync(request);
             return Ok();
@@ -55,7 +55,7 @@ namespace Classifieds_API.Controllers
 
         [HttpPut]
         [Authorize(Role.User, Role.Admin)]
-        public async Task<IActionResult> Update(PostUpdateDto dto)
+        public async Task<IActionResult> Update([FromForm]PostUpdateDto dto)
         {
             await _postService.UpdateAsync(dto);
             return Ok();
