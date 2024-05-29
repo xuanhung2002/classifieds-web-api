@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Classifieds.Data.DTOs;
 using Classifieds.Data.DTOs.WatchListDtos;
 using Classifieds.Data.Entities;
 using Classifieds.Repository;
@@ -24,18 +25,43 @@ namespace Classifieds.Services.Services
             _mapper = mapper;
             _currentUserService = currentUserService;
         }
+
+        public async Task<List<WatchListDto>> GetWatchListOfCurrentUser()
+        {
+            var currentUser = _currentUserService.User;
+            if(currentUser != null )
+            {
+                var watchList = await _repository.GetAsync<WatchList, WatchListDto>(s => new WatchListDto
+                {
+                    UserId = s.UserId,
+                    Post = _mapper.Map<PostDto>(s.Post)
+                }, s => s.UserId == currentUser.Id); ;
+                return watchList;
+
+            }
+            else
+            {
+                throw new UnauthorizedAccessException("Unauthorize..");
+            }
+
+        }
         public async Task AddWatchPost(AddWatchPostDto dto)
         {
-            var watchPost = _mapper.Map<WatchList>(dto);
-            var watchOfUser = await GetPostIdsByUserId(watchPost.UserId);
+            var watchOfUser = await GetPostIdsByUserId(_currentUserService.User!.Id);
             if(watchOfUser != null)
             {
-                if (watchOfUser.Contains(watchPost.Id))
+                if (watchOfUser.Contains(dto.PostId))
                 {
                     throw new Exception("You has already watched this post");
                 }
             }
-            await _repository.AddAsync(watchPost);
+
+            var watch = new WatchList
+            {
+                PostId = dto.PostId,
+                UserId = _currentUserService.User!.Id
+            };
+            await _repository.AddAsync(watch);
         }
 
         public async Task<List<Guid>?> GetPostIdsByUserId(Guid userId)
@@ -49,6 +75,7 @@ namespace Classifieds.Services.Services
             var userIds = await _repository.GetAsync<WatchList, Guid>(s => s.UserId, s => s.PostId == postId);
             return userIds;
         }
+
 
         public async Task<bool> IsWatching(Guid postId)
         {

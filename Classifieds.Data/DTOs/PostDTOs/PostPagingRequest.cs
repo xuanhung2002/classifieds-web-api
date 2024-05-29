@@ -14,5 +14,6 @@ namespace Classifieds.Data.DTOs.PostDTOs
         public Address? Address { get; set; }
         public Guid? CategoryId { get; set; }
         public PostType? PostType { get; set; }
+        public ItemStatus? Status { get; set; }
     }
 }

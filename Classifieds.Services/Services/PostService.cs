@@ -9,6 +9,7 @@ using Classifieds.Services.IServices;
 using Classifieds.Services.SignalR;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using System.Linq.Expressions;
@@ -287,6 +288,10 @@ namespace Classifieds.Services.Services
             {
                 posts = (IOrderedQueryable<Post>)posts.Where(p => p.PostType == request.PostType);
             }
+            if(request.Status != null)
+            {
+                posts = (IOrderedQueryable<Post>)posts.Where(p => p.Status == request.Status);
+            }
 
             // Retrieve all filtered and sorted data from the database
             var postList = await posts.ToListAsync();
@@ -355,6 +360,25 @@ namespace Classifieds.Services.Services
             }
             await _repository.UpdateAsync(post);
             _logger.LogInformation($"Update post: {post.Id}, mark SOLD");
+        }
+
+        public async Task<List<PostDto>> GetPostOfCurrentUser(PostOfUserRequest request)
+        {   
+            var currentUser = _currentUserService?.User;
+            if(currentUser == null)
+            {
+                throw new UnauthorizedAccessException("Unauthorize..");
+            }
+
+            var post = await _repository.GetAsync<Post, PostDto>(s => _mapper.Map<PostDto>(s),s => s.UserId == currentUser.Id);
+            if (request.Status != null) {
+                post = post.Where(s => s.Status == request.Status).ToList();
+            }
+            if(request.PostType != null)
+            {
+                post = post.Where(s => s.PostType == request.PostType).ToList();
+            }
+            return post;
         }
     }
 }

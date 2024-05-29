@@ -107,5 +107,13 @@ namespace Classifieds_API.Controllers
             await _postService.MarkSold(id);
             return Ok();
         }
+
+        [HttpPost("mypost")]
+        [Authorize(Role.User, Role.Admin)]
+        public async Task<IActionResult> GetMyPost(PostOfUserRequest request)
+        {
+            var res = await _postService.GetPostOfCurrentUser(request);
+            return Ok(res);
+        }
     }
 }

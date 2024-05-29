@@ -76,6 +76,7 @@ namespace Classifieds.Services.Services
                     CreatedAt = s.User.CreatedAt,
                     PhoneNumber = s.User.PhoneNumber,
                     Name = s.User.Name, 
+                    Role = s.User.Role,
                 }
                 
             } ,s => s.PostId == postId);
