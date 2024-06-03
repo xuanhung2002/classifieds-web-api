@@ -20,7 +20,7 @@ namespace Classifieds_API.Controllers
         }
 
         [HttpPost]
-        [Authorize(Role.User, Role.Admin)]
+        [Authorize(Role.User, Role.Admin, Role.SuperAdmin)]
         public async Task<IActionResult> CreateBid(CreateBidRequest request)
         {
             var res = await _bidService.CreateBidAsync(request, User.Id);

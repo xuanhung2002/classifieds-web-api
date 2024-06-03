@@ -19,7 +19,7 @@ namespace Classifieds_API.Controllers
         }
 
         [HttpPost]
-        [Authorize(Role.User, Role.Admin)]
+        [Authorize(Role.User, Role.Admin, Role.SuperAdmin)]
         public async Task<IActionResult> AddPostToWatchList(AddWatchPostDto dto)
         {
             await _watchListService.AddWatchPost(dto);
@@ -27,7 +27,7 @@ namespace Classifieds_API.Controllers
         }
 
         [HttpGet]
-        [Authorize(Role.User, Role.Admin)]
+        [Authorize(Role.User, Role.Admin, Role.SuperAdmin)]
         public async Task<IActionResult> GetWatchList()
         {
             

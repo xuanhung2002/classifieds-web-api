@@ -17,7 +17,6 @@ namespace Common
         {
             try
             {
-                if (context.Users.Any()) return;
 
                 using var hashFunc = new HMACSHA256();
                 var passwordBytes = Encoding.UTF8.GetBytes("admin@12345");
@@ -33,7 +32,21 @@ namespace Common
                     PasswordSalt = hashFunc.Key
                 };
 
-                context.Users.Add(newUser);
+                var superAdmin = new User
+                {
+                    AccountName = "superadmin",
+                    Name = "superadmin",
+                    PhoneNumber = "0384651408",
+                    Email = "superadmin@gmail.com",
+                    Role = Role.SuperAdmin,
+                    PasswordHash = hashFunc.ComputeHash(Encoding.UTF8.GetBytes("superadmin@12345")),
+                    PasswordSalt = hashFunc.Key
+                };
+
+                if(!context.Users.Any(s => s.AccountName == newUser.AccountName)) { context.Users.Add(newUser); }
+                if (!context.Users.Any(s => s.AccountName == superAdmin.AccountName)) { context.Users.Add(superAdmin); }
+
+
                 context.SaveChanges();
 
                 if (context.Categories.Any()) return;

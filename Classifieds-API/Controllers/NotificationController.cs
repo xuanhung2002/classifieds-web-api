@@ -18,7 +18,7 @@ namespace Classifieds_API.Controllers
         }
 
         [HttpGet]
-        [Authorize(Role.User, Role.Admin)]
+        [Authorize(Role.User, Role.Admin, Role.SuperAdmin)]
         public async Task<IActionResult> GetByUserId()
         {
             var res = await _notificationSerivce.GetByUserIdAsync(User.Id);

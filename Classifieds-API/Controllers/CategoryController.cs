@@ -1,5 +1,7 @@
 ﻿using Classifieds.Data.DTOs;
+using Classifieds.Data.Enums;
 using Classifieds.Services.IServices;
+using Classifieds_API.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Classifieds_API.Controllers
@@ -15,6 +17,7 @@ namespace Classifieds_API.Controllers
             _categoryService = categoryService;
         }
         [HttpPost]
+        [Authorize(Role.Admin, Role.SuperAdmin)]
         public async Task<IActionResult> Add(AddCategoryRequest dto)
         {
             var category = await _categoryService.AddAsync(dto);

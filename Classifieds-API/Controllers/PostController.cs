@@ -46,7 +46,7 @@ namespace Classifieds_API.Controllers
         }
 
         [HttpPost]
-        [Authorize(Role.User, Role.Admin)]
+        [Authorize(Role.User, Role.Admin, Role.SuperAdmin)]
         public async Task<IActionResult> Create([FromForm] PostAddDto request)
         {
             await _postService.AddAsync(request);
@@ -54,7 +54,7 @@ namespace Classifieds_API.Controllers
         }
 
         [HttpPut]
-        [Authorize(Role.User, Role.Admin)]
+        [Authorize(Role.User, Role.Admin, Role.SuperAdmin)]
         public async Task<IActionResult> Update([FromForm]PostUpdateDto dto)
         {
             await _postService.UpdateAsync(dto);
@@ -62,7 +62,7 @@ namespace Classifieds_API.Controllers
         }
 
         [HttpDelete]
-        [Authorize(Role.User, Role.Admin)]
+        [Authorize(Role.User, Role.Admin, Role.SuperAdmin)]
         public async Task<IActionResult> Delete(Guid id)
         {
             var post = await _postService.GetByIdAsync(id);
@@ -78,14 +78,14 @@ namespace Classifieds_API.Controllers
         }
 
         [HttpPut("open-auction")]
-        [Authorize(Role.User, Role.Admin)]
+        [Authorize(Role.User, Role.Admin, Role.SuperAdmin)]
         public async Task<IActionResult> OpenAuction(OpenAuctionDto model)
         {
             await _postService.OpenAuction(model, User.Id);
             return Ok();
         }
         [HttpPut("reopen-auction")]
-        [Authorize(Role.User, Role.Admin)]
+        [Authorize(Role.User, Role.Admin, Role.SuperAdmin)]
         public async Task<IActionResult> ReOpenAuction(OpenAuctionDto model)
         {
             await _postService.ReOpenAuction(model, User.Id);
@@ -93,7 +93,7 @@ namespace Classifieds_API.Controllers
         }
 
         [HttpPut("close-auction/{id}")]
-        [Authorize(Role.User, Role.Admin)]
+        [Authorize(Role.User, Role.Admin, Role.SuperAdmin)]
         public async Task<IActionResult> CloseAuction(Guid id)
         {
             await _postService.CloseAuction(id, User.Id);
@@ -101,7 +101,7 @@ namespace Classifieds_API.Controllers
         }
 
         [HttpPut("mark-sold/{id}")]
-        [Authorize(Role.User, Role.Admin)]
+        [Authorize(Role.User, Role.Admin, Role.SuperAdmin)]
         public async Task<IActionResult> MarkSold(Guid id)
         {
             await _postService.MarkSold(id);
@@ -109,7 +109,7 @@ namespace Classifieds_API.Controllers
         }
 
         [HttpPost("mypost")]
-        [Authorize(Role.User, Role.Admin)]
+        [Authorize(Role.User, Role.Admin, Role.SuperAdmin)]
         public async Task<IActionResult> GetMyPost(PostOfUserRequest request)
         {
             var res = await _postService.GetPostOfCurrentUser(request);
