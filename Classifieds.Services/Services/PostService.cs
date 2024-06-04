@@ -129,11 +129,12 @@ namespace Classifieds.Services.Services
             post.Address = dto.Address;
             post.Price = dto.Price;
             post.Description = dto.Description;
-            post.Status = dto.Status;
             post.ItemCondition = dto.ItemCondition;
             post.CategoryId = dto.CategoryId;
 
-            return await _repository.UpdateAsync(post);
+            var entity = await _repository.UpdateAsync(post);
+            _logger.LogInformation($"Update post: {entity.Id}");
+            return entity;
         }
 
         public async Task<int> DeleteAsync(Guid id)

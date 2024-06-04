@@ -14,6 +14,9 @@ namespace Classifieds.Data
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<Bid> Bids{ get; set; }
         public DbSet<WatchList> WatchLists { get; set; }
+        public DbSet<Chat> Chats { get; set; }
+        public DbSet<ChatMessage> ChatMessages { get; set; }
+        public DbSet<ChatUser> ChatUsers { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Post>()

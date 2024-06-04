@@ -110,7 +110,7 @@ namespace Classifieds_API.Controllers
 
         [HttpPost("mypost")]
         [Authorize(Role.User, Role.Admin, Role.SuperAdmin)]
-        public async Task<IActionResult> GetMyPost(PostOfUserRequest request)
+        public async Task<IActionResult> GetMyPost([FromForm]PostOfUserRequest request)
         {
             var res = await _postService.GetPostOfCurrentUser(request);
             return Ok(res);

@@ -12,8 +12,6 @@ namespace Classifieds.Data.DTOs
         public string? Description { get; set; }
         public decimal Price { get; set; }
         public ItemCondition ItemCondition { get; set; }
-        public ItemStatus Status { get; set; }
-
         public Address Address { get; set; } = null!;
         public Guid CategoryId { get; set; }
         public Guid UserId { get; set; }
