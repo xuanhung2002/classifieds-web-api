@@ -9,6 +9,6 @@ namespace Classifieds.Data.DTOs.WatchListDtos
     public class WatchListDto : BaseDto
     {
         public Guid UserId { get; set; }
-        public PostDto Post { get; set; }
+        public List<PostDto> Posts { get; set; } = new List<PostDto>();
     }
 }

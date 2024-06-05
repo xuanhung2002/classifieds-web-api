@@ -26,18 +26,29 @@ namespace Classifieds.Services.Services
             _currentUserService = currentUserService;
         }
 
-        public async Task<List<WatchListDto>> GetWatchListOfCurrentUser()
+        public async Task<WatchListDto> GetWatchListOfCurrentUser()
         {
             var currentUser = _currentUserService.User;
             if(currentUser != null )
             {
-                var watchList = await _repository.GetAsync<WatchList, WatchListDto>(s => new WatchListDto
+                var watchListDto = new WatchListDto();
+                var watchList = await _repository.GetAsync<WatchList, WatchList>(s => new WatchList
                 {
+                    Id = s.Id,
+                    Post = s.Post,
+                    PostId = s.PostId,
+                    User = s.User,
                     UserId = s.UserId,
-                    Post = _mapper.Map<PostDto>(s.Post)
-                }, s => s.UserId == currentUser.Id); ;
-                return watchList;
+                    CreatedAt = s.CreatedAt,
+                    UpdatedAt = s.UpdatedAt,
+                } ,s => s.UserId == currentUser.Id); 
+                watchListDto.UserId = currentUser.Id;
+                foreach ( var item in watchList )
+                {
+                    watchListDto.Posts.Add(_mapper.Map<PostDto>(item.Post));
+                }
 
+                return watchListDto;
             }
             else
             {

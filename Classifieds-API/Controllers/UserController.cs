@@ -46,8 +46,13 @@ namespace Classifieds_API.Controllers
 
                 return Unauthorized("Invalid token");
             }
+        }
 
-
+        [HttpGet("all")]
+        public async Task<IActionResult> GetAll()
+        {
+            var user = await _userService.GetUsers(s => true);
+            return Ok(user);
         }
     }
 }
