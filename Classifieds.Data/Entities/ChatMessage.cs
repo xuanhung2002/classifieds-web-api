@@ -10,10 +10,10 @@ namespace Classifieds.Data.Entities
 {
     public class ChatMessage : BaseEntity
     {
-        public required string Type { get; set; }
-        public required string Message { get; set; }
+        public string Type { get; set; }
+        public string Message { get; set; }
         public Guid ChatId { get; set; }
-        public required Chat Chat { get; set; }
-        public int FromUserId { get; set; }
+        public Chat Chat { get; set; }
+        public Guid FromUserId { get; set; }
     }
 }

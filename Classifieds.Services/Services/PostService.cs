@@ -173,8 +173,8 @@ namespace Classifieds.Services.Services
             post.AuctionStatus = AuctionStatus.Opening;
             post.StartAmount = dto.StartAmount;
             post.EndTime = dto.EndTime;
-
             await _repository.UpdateAsync(post);
+            await _hubContext.Clients.Group($"Post-{dto.Id}").SendAsync("AuctionStarted");
         }
         public async Task ReOpenAuction(OpenAuctionDto dto, Guid userId)
         {

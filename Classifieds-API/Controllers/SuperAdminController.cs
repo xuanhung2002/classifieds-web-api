@@ -17,7 +17,7 @@ namespace Classifieds_API.Controllers
         }
 
         [HttpGet("admin")]
-        [Authorize(Role.SuperAdmin)]
+        [Authorize(Role.Admin, Role.SuperAdmin)]
         public async Task<IActionResult> GetAllAdmin()
         {
             var admins = await _userService.GetUsers(s => s.Role == Role.Admin);
