@@ -115,5 +115,12 @@ namespace Classifieds_API.Controllers
             var res = await _postService.GetPostOfCurrentUser(request);
             return Ok(res);
         }
+
+        [HttpDelete("{id}")]
+        [Authorize(Role.SuperAdmin, Role.Admin, Role.User)]
+        public async Task<IActionResult> DeletePost(Guid id)
+        {
+            return Ok();
+        }
     }
 }

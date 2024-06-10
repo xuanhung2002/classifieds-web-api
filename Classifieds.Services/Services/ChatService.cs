@@ -122,7 +122,7 @@ namespace Classifieds.Services.Services
             var chatIdInChatUserOfUser = chatUsers.Where(cu => cu.UserId == userId).Select(cu => cu.ChatId);
             var isChatIdOfUserAndPartnerIntersect = chatIdInChatUserOfPartner.Intersect(chatIdInChatUserOfUser).Any();
             var isChatTypeDual = isChatIdOfUserAndPartnerIntersect
-                ? await _repository.GetAsync<Chat>(c => chatIdInChatUserOfPartner.Intersect(chatIdInChatUserOfUser).Contains(c.Id) && c.Type == "dual").Any()
+                ? (await _repository.GetAsync<Chat>(c => chatIdInChatUserOfPartner.Intersect(chatIdInChatUserOfUser).Contains(c.Id) && c.Type == "dual")).Any()
                 : false;
             var isUserAndPartnerAlreadyChat = isChatIdOfUserAndPartnerIntersect && isChatTypeDual;
 

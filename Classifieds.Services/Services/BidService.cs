@@ -40,7 +40,11 @@ namespace Classifieds.Services.Services
                 Amount = request.Amount,
                 BidTime = DateTime.UtcNow
             };
-            if(post.CurrentAmount >= request.Amount)
+            if (post.StartAmount >= request.Amount)
+            {
+                throw new Exception("Can't bid with the value less than start value");
+            }
+            if (post.CurrentAmount >= request.Amount)
             {
                 throw new Exception("Can't bid with the value less than current value");
             }

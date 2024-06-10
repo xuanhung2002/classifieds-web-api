@@ -33,8 +33,8 @@ namespace Classifieds_API.Controllers
             return Ok(res.CreateChatResponseModels);
         }
 
-        [HttpGet("messages/{id:Guid}/{page:Guid}")]
-        public async Task<IActionResult> GetMessages(Guid id, Guid page)
+        [HttpGet("messages/{id:Guid}/{page:int}")]
+        public async Task<IActionResult> GetMessages(Guid id, int page)
         {
             var res = await _chatService.Messages(id, page);
             return Ok(res);
@@ -56,3 +56,4 @@ namespace Classifieds_API.Controllers
         //    return Ok(res);
         //}
     }
+}
