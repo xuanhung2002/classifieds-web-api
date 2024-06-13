@@ -2,6 +2,7 @@
 using Classifieds.Data.Entities;
 using Classifieds.Repository;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Logging;
 
 namespace Classifieds.Services.SignalR
 {
@@ -10,14 +11,21 @@ namespace Classifieds.Services.SignalR
         private readonly IDictionary<Guid, UserConnection> users;
         private readonly IDictionary<string, Guid> userSockets;
         private readonly IDBRepository _repository;
+        private readonly ILogger<ChatHub> _logger;
 
-        public ChatHub(IDBRepository repository, IDictionary<Guid, UserConnection> _users, IDictionary<string, Guid> _userSockets)
+        public ChatHub(IDBRepository repository, IDictionary<Guid, UserConnection> _users, IDictionary<string, Guid> _userSockets, ILogger<ChatHub> logger)
         {
             _repository = repository;
             users = _users;
             userSockets = _userSockets;
+            _logger = logger;
         }
-
+        public override Task OnConnectedAsync()
+        {
+            _logger.LogInformation("Connect chat signalR");
+            _logger.LogInformation($"Client connected: {Context.ConnectionId}");
+            return base.OnConnectedAsync();
+        }
         // Handles when a user joins the chat
         public async Task Join(UserResponse user)
         {

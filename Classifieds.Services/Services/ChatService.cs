@@ -96,7 +96,7 @@ namespace Classifieds.Services.Services
                             ChatId = chatUser.ChatId,
                         },
                         Users = userResponseList,
-                        Messages = messageResponseList,
+                        Messages = messageResponseList.OrderBy(s => s.CreatedAt).ToList(),
                     };
                     res.Add(result);
                 }
@@ -366,7 +366,7 @@ namespace Classifieds.Services.Services
 
             // Retrieve the latest 20 messages for this chat
             var messages = await _repository.GetSet<ChatMessage>(cm => cm.ChatId == chatId)
-                                            .OrderByDescending(cm => cm.CreatedAt)
+                                            .OrderBy(cm => cm.CreatedAt)
                                             .Take(20)
                                             .ToListAsync();
 

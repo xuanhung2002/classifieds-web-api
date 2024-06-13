@@ -1,4 +1,5 @@
-﻿using Classifieds.Repository;
+﻿using Classifieds.Data.DTOs.ChatDtos;
+using Classifieds.Repository;
 using Classifieds.Services.IServices;
 using Classifieds.Services.Services;
 using Classifieds.Services.SignalR;
@@ -18,6 +19,9 @@ namespace Classifieds_API.Extensions
 
         public static void AddServices(this IServiceCollection services)
         {
+            services.AddSingleton<IDictionary<Guid, UserConnection>>(new Dictionary<Guid, UserConnection>());
+            services.AddSingleton<IDictionary<string, Guid>>(new Dictionary<string, Guid>());
+
             services.AddScoped<IDBRepository, DBRepository>();
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IUserService, UserService>();
