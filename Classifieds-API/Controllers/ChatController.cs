@@ -25,6 +25,18 @@ namespace Classifieds_API.Controllers
             var res = await _chatService.GetChatByUserId(User.Id);
             return Ok(res);
         }
+        [HttpGet("users")]
+        public async Task<IActionResult> GetAllChatUser()
+        {
+            var res = await _chatService.GetExistUserChatByUserId(User.Id);
+            return Ok(res);
+        }
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetChatById(Guid id)
+        {
+            var res = await _chatService.GetChatById(id);
+            return Ok(res);
+        }
 
         [HttpPost("create")]
         public async Task<IActionResult> Create(CreateChatRequest model)

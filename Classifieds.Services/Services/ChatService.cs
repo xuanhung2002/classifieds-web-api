@@ -1,4 +1,5 @@
-﻿using Classifieds.Data.DTOs.ChatDtos;
+﻿using Classifieds.Data.DTOs;
+using Classifieds.Data.DTOs.ChatDtos;
 using Classifieds.Data.Entities;
 using Classifieds.Repository;
 using Classifieds.Services.IServices;
@@ -117,18 +118,79 @@ namespace Classifieds.Services.Services
                 throw new AppException("Cannot chat with yourself!");
             }
 
-            var chatUsers = await _repository.GetAsync<ChatUser>(cu => cu.UserId == partnerId || cu.UserId == userId);
-            var chatIdInChatUserOfPartner = chatUsers.Where(cu => cu.UserId == partnerId).Select(cu => cu.ChatId);
-            var chatIdInChatUserOfUser = chatUsers.Where(cu => cu.UserId == userId).Select(cu => cu.ChatId);
-            var isChatIdOfUserAndPartnerIntersect = chatIdInChatUserOfPartner.Intersect(chatIdInChatUserOfUser).Any();
-            var isChatTypeDual = isChatIdOfUserAndPartnerIntersect
-                ? (await _repository.GetAsync<Chat>(c => chatIdInChatUserOfPartner.Intersect(chatIdInChatUserOfUser).Contains(c.Id) && c.Type == "dual")).Any()
-                : false;
-            var isUserAndPartnerAlreadyChat = isChatIdOfUserAndPartnerIntersect && isChatTypeDual;
+            var partner = (await _repository.GetAsync<ChatUser, ChatUser>(s => new ChatUser
+            {
+                Id = s.Id,
+                UserId = s.UserId,
+                ChatId = s.ChatId,
+                User = s.User,
+                CreatedAt = s.CreatedAt,
+                UpdatedAt = s.UpdatedAt
+            }, cu => cu.UserId == partnerId)).FirstOrDefault();
+            var user = (await _repository.GetAsync<ChatUser, ChatUser>(s => new ChatUser
+            {
+                Id = s.Id,
+                UserId = s.UserId,
+                ChatId = s.ChatId,
+                User = s.User,
+                CreatedAt = s.CreatedAt,
+                UpdatedAt = s.UpdatedAt
+            }, cu => cu.UserId == userId)).FirstOrDefault();
+
+            var chatUsers = new List<ChatUser>() { partner, user };
+            var userChatIds = chatUsers.Select(cu => cu.ChatId);
+
+            var isUserAndPartnerAlreadyChat = (await _repository.GetAsync<Chat>(c =>
+                userChatIds.Contains(c.Id) &&
+                c.Type == "dual"
+            )).Any();
 
             if (isUserAndPartnerAlreadyChat)
             {
-                throw new AppException("Chat with this user already exists!");
+                // Trả về ID của cuộc trò chuyện đầu tiên mà bạn tìm thấy
+                var chatId = (await _repository.GetAsync<Chat>(c =>
+                    userChatIds.Contains(c.Id) &&
+                    c.Type == "dual"
+                )).FirstOrDefault()!.Id;
+
+                if (chatId != null)
+                {
+                    return new CreateChatResponse
+                    {
+                        CreateChatResponseModels = new List<CreateChatResponseModel>
+                        {
+                            new CreateChatResponseModel
+                            {
+                                Id = chatId,
+                                Type = "dual",
+                                ChatUser = new
+                                {
+                                    chatId,
+                                    userId,
+                                    createdAt = DateTime.UtcNow,
+                                    updatedAt = DateTime.UtcNow
+                                },
+                                Users = new List<UserInMessage>
+                                {
+                                    new UserInMessage
+                                    {
+                                        Id = userId,
+                                        Avatar = user.User.Avatar,
+                                        Name = user.User.Name,
+                                        Email = user.User.Email,
+                                    },
+                                    new UserInMessage
+                                    {
+                                        Id = partnerId,
+                                        Avatar = partner.User.Avatar,
+                                        Name = partner.User.Name,
+                                        Email = partner.User.Email,
+                                    }
+                                }
+                            }
+                        }
+                    };
+                }
             }
 
             var chat = new Chat
@@ -139,10 +201,10 @@ namespace Classifieds.Services.Services
             await _repository.AddAsync(chat);
 
             var chatUsersToAdd = new List<ChatUser>
-            {
-                new ChatUser { UserId = userId, ChatId = chat.Id },
-                new ChatUser { UserId = partnerId, ChatId = chat.Id }
-            };
+    {
+        new ChatUser { UserId = userId, ChatId = chat.Id },
+        new ChatUser { UserId = partnerId, ChatId = chat.Id }
+    };
 
             await _repository.AddRangeAsync(chatUsersToAdd);
 
@@ -162,15 +224,15 @@ namespace Classifieds.Services.Services
                     updatedAt = DateTime.UtcNow
                 },
                 Users = new List<UserInMessage>
-                {
-                    new UserInMessage
-                    {
-                        Id = partnerInfo.Id,
-                        Avatar = partnerInfo.Avatar,
-                        Name = partnerInfo.Name,
-                        Email = partnerInfo.Email,
-                    }
-                }
+        {
+            new UserInMessage
+            {
+                Id = partnerInfo.Id,
+                Avatar = partnerInfo.Avatar,
+                Name = partnerInfo.Name,
+                Email = partnerInfo.Email,
+            }
+        }
             };
 
             var forReceiver = new CreateChatResponseModel
@@ -185,15 +247,15 @@ namespace Classifieds.Services.Services
                     updatedAt = DateTime.UtcNow
                 },
                 Users = new List<UserInMessage>
-                {
-                    new UserInMessage
-                    {
-                        Id = userInfo.Id,
-                        Avatar = userInfo.Avatar,
-                        Name = userInfo.Name,
-                        Email = userInfo.Email
-                    }
-                },
+        {
+            new UserInMessage
+            {
+                Id = userInfo.Id,
+                Avatar = userInfo.Avatar,
+                Name = userInfo.Name,
+                Email = userInfo.Email
+            }
+        },
             };
 
             return new CreateChatResponse
@@ -201,6 +263,7 @@ namespace Classifieds.Services.Services
                 CreateChatResponseModels = new List<CreateChatResponseModel> { forCreator, forReceiver }
             };
         }
+
 
         public async Task<object> Delete(Guid chatId)
         {
@@ -247,7 +310,7 @@ namespace Classifieds.Services.Services
 
             if (page > totalPages)
             {
-                return new { messages = new List<MessageResponse>()};
+                return new { messages = new List<MessageResponse>() };
             }
 
             // Fetch messages with pagination
@@ -290,6 +353,172 @@ namespace Classifieds.Services.Services
         public object UpLoadImage(Stream image)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<GetChatByUserIdResponse> GetChatById(Guid chatId)
+        {
+            // Retrieve the chat with the specified ID
+            var chat = await _repository.FindAsync<Chat>(c => c.Id == chatId);
+            if (chat == null)
+            {
+                return null; // or throw an exception, based on your error handling preference
+            }
+
+            // Retrieve all ChatUsers associated with the specified chatId
+            var chatUsers = await _repository.GetAsync<ChatUser>(cu => cu.ChatId == chatId);
+            if (chatUsers == null || !chatUsers.Any())
+            {
+                return null; // or handle the scenario where there are no chat users
+            }
+            var userIds = chatUsers.Select(cu => cu.UserId).Distinct().ToList();
+
+            // Retrieve user details for these ChatUsers
+            var users = await _repository.GetAsync<User>(u => userIds.Contains(u.Id));
+            var usersDict = users.ToDictionary(u => u.Id);
+
+            // Retrieve the latest 20 messages for this chat
+            var messages = await _repository.GetSet<ChatMessage>(cm => cm.ChatId == chatId)
+                                            .OrderByDescending(cm => cm.CreatedAt)
+                                            .Take(20)
+                                            .ToListAsync();
+
+            // Prepare user response list
+            var userResponseList = users.Select(user => new UserResponse
+            {
+                Id = user.Id,
+                Avatar = user.Avatar,
+                Name = user.Name,
+                Email = user.Email,
+                ChatUser = new ChatUserResponse
+                {
+                    ChatId = chatId,
+                    UserId = user.Id,
+                }
+            }).ToList();
+
+            // Prepare message response list
+            var messageResponseList = messages.Select(m => new MessageResponse
+            {
+                Id = m.Id,
+                Type = m.Type,
+                Message = m.Message,
+                ChatId = m.ChatId,
+                FromUserId = m.FromUserId,
+                CreatedAt = m.CreatedAt,
+                UpdatedAt = m.UpdatedAt,
+                User = usersDict.TryGetValue(m.FromUserId, out var user) ? new UserInMessage
+                {
+                    Id = user.Id,
+                    Avatar = user.Avatar,
+                    Name = user.Name,
+                    Email = user.Email,
+                } : null
+            }).ToList();
+
+            // Prepare the response object
+            var response = new GetChatByUserIdResponse
+            {
+                Id = chat.Id,
+                Type = chat.Type,
+                ChatUser = new ChatUserResponse
+                {
+                    UserId = chatUsers.FirstOrDefault()?.UserId ?? Guid.Empty,
+                    ChatId = chatUsers.FirstOrDefault()?.ChatId ?? Guid.Empty,
+                },
+                Users = userResponseList,
+                Messages = messageResponseList,
+            };
+
+            return response;
+        }
+
+        public async Task<List<UserDto>> GetExistUserChatByUserId(Guid id)
+        {
+            var chatUsers = await _repository.GetAsync<ChatUser, ChatUser>(s => new ChatUser
+            {
+                Id = s.Id,
+                Chat = s.Chat,
+                ChatId = s.ChatId,
+                User = s.User,
+                UserId = s.UserId,
+                CreatedAt = s.CreatedAt,
+                UpdatedAt = s.UpdatedAt
+            }, s => s.UserId == id);
+            var chatIds = chatUsers.Select(cu => cu.ChatId).Distinct().ToList();
+            var chatUsersContainChatWithUsers = await _repository.GetAsync<ChatUser>(cu => chatIds.Contains(cu.ChatId));
+            var chats = await _repository.GetAsync<Chat>(c => chatIds.Contains(c.Id));
+            var userIds = chatUsersContainChatWithUsers.Select(cu => cu.UserId).Distinct().ToList();
+            var users = await _repository.GetAsync<User>(a => userIds.Contains(a.Id));
+
+            var messages = await _repository.GetSet<ChatMessage>(cm => chatIds.Contains(cm.ChatId)).Take(20).ToListAsync();
+
+            var res = new List<UserDto>();
+
+            foreach (var chat in chats)
+            {
+                var chatUser = chatUsers.FirstOrDefault(cu => cu.UserId == id && cu.ChatId == chat.Id);
+
+                var userIdsChatWith = chatUsersContainChatWithUsers
+                    .Where(cu => cu.ChatId == chat.Id && cu.UserId != id)
+                    .Select(cu => cu.UserId)
+                    .ToList();
+
+                var usersChatWith = users
+                    .Where(u => userIdsChatWith.Contains(u.Id))
+                    .ToList();
+
+                var userResponseList = usersChatWith
+                    .Select(user => new UserResponse
+                    {
+                        Id = user.Id,
+                        Avatar = user.Avatar,
+                        Name = user.Name,
+                        Email = user.Email,
+                        ChatUser = new ChatUserResponse
+                        {
+                            ChatId = chatUsersContainChatWithUsers
+                                .FirstOrDefault(cu => cu.ChatId == chat.Id && cu.UserId == user.Id)?
+                                .ChatId ?? Guid.NewGuid(),
+                            UserId = user.Id,
+                        }
+                    })
+                    .ToList();
+
+                var messageResponseList = messages
+                    .Where(m => m.ChatId == chat.Id)
+                    .Select(m => new MessageResponse
+                    {
+                        Id = m.Id,
+                        Type = m.Type,
+                        Message = m.Message,
+                        ChatId = m.ChatId,
+                        FromUserId = m.FromUserId,
+                        CreatedAt = m.CreatedAt,
+                        UpdatedAt = m.CreatedAt,
+                        User = new UserInMessage
+                        {
+                            Id = m.FromUserId,
+                            Avatar = users.FirstOrDefault(u => u.Id == m.FromUserId)?.Avatar,
+                            Email = users.FirstOrDefault(u => u.Id == m.FromUserId)?.Email,
+                        }
+                    })
+                    .ToList();
+
+                if (chatUser != null)
+                {
+                    var result = new UserDto
+                    {
+                        Id = chat.Id,
+                        AccountName = chatUser.User.Name,
+                        Name = chatUser.User.Name,
+                        Email = chatUser.User.Email,
+                        Avatar = chatUser.User.Avatar,
+                    };
+                    res.Add(result);
+                }
+            }
+
+            return res;
         }
     }
 }

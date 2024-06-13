@@ -30,6 +30,7 @@ namespace Classifieds_API.Extensions
             services.AddScoped<IBidService, BidService>();
             services.AddScoped<IWatchListService, WatchListService>();
             services.AddScoped<INotificationSerivce, NotificationService>();
+            services.AddScoped<IChatService, ChatService>();
         }
         public static void AddJwt(this IServiceCollection services, IConfiguration configuration)
         {

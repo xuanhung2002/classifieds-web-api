@@ -54,5 +54,12 @@ namespace Classifieds_API.Controllers
             var user = await _userService.GetUsers(s => true);
             return Ok(user);
         }
+
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchUserByNameOrByEmail(string searchKey)
+        {
+            var users = await _userService.GetUsers(s => s.AccountName.ToLower().Contains(searchKey) || s.Email.ToLower().Contains(searchKey));
+            return Ok(users);
+        }
     }
 }
