@@ -12,13 +12,15 @@ namespace Classifieds.Services.SignalR
         private readonly IDictionary<string, Guid> userSockets;
         private readonly IDBRepository _repository;
         private readonly ILogger<ChatHub> _logger;
+        private readonly IHubContext<NotificationHub> _notificationHubContext;
 
-        public ChatHub(IDBRepository repository, IDictionary<Guid, UserConnection> _users, IDictionary<string, Guid> _userSockets, ILogger<ChatHub> logger)
+        public ChatHub(IDBRepository repository, IDictionary<Guid, UserConnection> _users, IDictionary<string, Guid> _userSockets, ILogger<ChatHub> logger, IHubContext<NotificationHub> notificationHubContext)
         {
             _repository = repository;
             users = _users;
             userSockets = _userSockets;
             _logger = logger;
+            _notificationHubContext = notificationHubContext;
         }
         public override Task OnConnectedAsync()
         {
@@ -28,7 +30,7 @@ namespace Classifieds.Services.SignalR
         }
         // Handles when a user joins the chat
         public async Task Join(UserResponse user)
-        {
+       {
             var sockets = new HashSet<string>();
 
             if (users.TryGetValue(user.Id, out var existingUser))
@@ -126,10 +128,11 @@ namespace Classifieds.Services.SignalR
                     try
                     {
                         await Clients.Client(socket).SendAsync("received", messageResponse);
+                        await Clients.Clients($"User-{message.ToUserId.ToString()}").SendAsync("ReceiveMessageNotification");
                     }
                     catch (Exception ex)
                     {
-                        // Log or handle the exception appropriately
+                        
                     }
                 });
 
@@ -137,7 +140,7 @@ namespace Classifieds.Services.SignalR
             }
             catch (Exception ex)
             {
-                // Log or handle the exception appropriately
+                _logger.LogWarning("send socket failed");
             }
         }
 
