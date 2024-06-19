@@ -1,4 +1,5 @@
-﻿using Classifieds.Data.DTOs.UserDtos;
+﻿using Classifieds.Data.DTOs.AdminDtos;
+using Classifieds.Data.DTOs.UserDtos;
 using Classifieds.Data.Enums;
 using Classifieds.Services.IServices;
 using Classifieds_API.Authorization;
@@ -25,9 +26,9 @@ namespace Classifieds_API.Controllers
         }
         [HttpPut("grant-permission")]
         [Authorize(Role.SuperAdmin)]
-        public async Task<IActionResult> GrantPermisson(Guid userId, Role role)
+        public async Task<IActionResult> GrantPermisson(ChangePermissionDto dto)
         {
-            await _userService.ChangePermission(userId, role);
+            await _userService.ChangePermission(dto.UserId, dto.Role);
             return Ok();
         }
 

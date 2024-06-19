@@ -1,6 +1,8 @@
 ﻿using Classifieds.Data.DTOs;
+using Classifieds.Data.DTOs.CategoryDTOs;
 using Classifieds.Data.Enums;
 using Classifieds.Services.IServices;
+using Classifieds.Services.Services;
 using Classifieds_API.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,13 +18,6 @@ namespace Classifieds_API.Controllers
         {
             _categoryService = categoryService;
         }
-        [HttpPost]
-        [Authorize(Role.Admin, Role.SuperAdmin)]
-        public async Task<IActionResult> Add(AddCategoryRequest dto)
-        {
-            var category = await _categoryService.AddAsync(dto);
-            return Ok(category);
-        }
 
         [HttpGet]
         public async Task<IActionResult> GetAll()
@@ -35,6 +30,20 @@ namespace Classifieds_API.Controllers
         {
             var category = await _categoryService.GetByIdAsync(id);
             return Ok(category);
+        }
+        [HttpPost]
+        [Authorize(Role.Admin, Role.SuperAdmin)]
+        public async Task<IActionResult> Create([FromForm] AddCategoryRequest request)
+        {
+            await _categoryService.AddAsync(request);
+            return Ok();
+        }
+        [HttpPut]
+        [Authorize(Role.Admin, Role.SuperAdmin)]
+        public async Task<IActionResult> Update([FromForm] UpdateCategoryRequest request)
+        {
+            await _categoryService.UpdateAsync(request);
+            return Ok();
         }
     }
 }
