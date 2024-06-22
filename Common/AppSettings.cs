@@ -17,6 +17,6 @@
         public static string CloudName { get; set; }
         public static string ApiKey { get; set; }
         public static string ApiSecret { get; set; }
-        public static string CORS { get; private set; }
+        public static List<string> CORS { get; private set; }
     }
 }

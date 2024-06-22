@@ -114,7 +114,7 @@ namespace Classifieds_API.Extensions
                     builder =>
                     {
                         builder
-                            .WithOrigins(AppSettings.CORS)
+                            .WithOrigins(AppSettings.CORS.ToArray())
                             .AllowAnyMethod()
                             .AllowCredentials()
                             .AllowAnyHeader();
