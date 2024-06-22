@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="13.0.1" />
+    <PackageReference Include="Microsoft.NET.Build.Containers" Version="8.0.302" />
   </ItemGroup>
 
   <ItemGroup>

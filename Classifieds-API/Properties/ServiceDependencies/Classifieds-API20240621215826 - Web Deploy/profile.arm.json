@@ -21,7 +21,7 @@
     },
     "resourceName": {
       "type": "string",
-      "defaultValue": "xhclassifieds",
+      "defaultValue": "Classifieds-API20240621215826",
       "metadata": {
         "description": "Name of the main resource to be created by this template."
       }
