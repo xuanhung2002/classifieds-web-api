@@ -59,13 +59,13 @@ namespace Classifieds_API.Controllers
             return Ok(res);
         }
 
-        //// Optionally include if image uploading is needed
-        //[HttpPost("upload-image")]
-        //public IActionResult UpLoadImage([FromForm] UploadImageRequest model)
-        //{
-        //    using var stream = model.image.OpenReadStream();
-        //    var res = _chatService.UpLoadImage(stream);
-        //    return Ok(res);
-        //}
+        // Optionally include if image uploading is needed
+        [HttpPost("upload-image")]
+        public async Task<IActionResult> UpLoadImage([FromForm] UploadImageRequest model)
+        {
+            using var stream = model.Image.OpenReadStream();
+            var res = await _chatService.UpLoadImage(stream);
+            return Ok(res);
+        }
     }
 }

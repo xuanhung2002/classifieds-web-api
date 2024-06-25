@@ -16,9 +16,11 @@ namespace Classifieds.Services.Services
     public class ChatService : IChatService
     {
         private readonly IDBRepository _repository;
-        public ChatService(IDBRepository repository)
+        private readonly IImageService _imageService;
+        public ChatService(IDBRepository repository, IImageService imageService)
         {
             _repository = repository;
+            _imageService = imageService;
         }
 
         public async Task<List<GetChatByUserIdResponse>> GetChatByUserId(Guid id)
@@ -338,9 +340,9 @@ namespace Classifieds.Services.Services
         }
 
 
-        public object UpLoadImage(Stream image)
+        public async Task<string> UpLoadImage(Stream image)
         {
-            throw new NotImplementedException();
+            return await _imageService.UploadImage(image);
         }
 
         public async Task<GetChatByUserIdResponse> GetChatById(Guid chatId)

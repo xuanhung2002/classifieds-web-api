@@ -61,7 +61,7 @@ namespace Classifieds_API.Controllers
             return Ok();
         }
 
-        [HttpDelete]
+        [HttpDelete("{id}")]
         [Authorize(Role.User, Role.Admin, Role.SuperAdmin)]
         public async Task<IActionResult> Delete(Guid id)
         {
@@ -73,6 +73,7 @@ namespace Classifieds_API.Controllers
                     return StatusCode(StatusCodes.Status403Forbidden, "Forbidden");
                 }
                 await _postService.DeleteAsync(id);
+                return Ok();
             }
             return BadRequest(new {message = "Post is not existed"});
         }
@@ -116,11 +117,5 @@ namespace Classifieds_API.Controllers
             return Ok(res);
         }
 
-        [HttpDelete("{id}")]
-        [Authorize(Role.SuperAdmin, Role.Admin, Role.User)]
-        public async Task<IActionResult> DeletePost(Guid id)
-        {
-            return Ok();
-        }
     }
 }

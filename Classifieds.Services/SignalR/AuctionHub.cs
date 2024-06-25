@@ -31,49 +31,50 @@ public class AuctionHub : Hub
         _userService = userService;
     }
 
-    public override async Task OnConnectedAsync()
+    public override Task OnConnectedAsync()
     {
-        try
-        {
-            var httpContext = Context.GetHttpContext();
-            var token = httpContext.Request.Query["access_token"].ToString();
-            if (string.IsNullOrEmpty(token))
-            {
-                throw new UnauthorizedAccessException("Invalid token!");
-            }
+        //try
+        //{
+        //    var httpContext = Context.GetHttpContext();
+        //    var token = httpContext.Request.Query["access_token"].ToString();
+        //    if (string.IsNullOrEmpty(token))
+        //    {
+        //        throw new UnauthorizedAccessException("Invalid token!");
+        //    }
 
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(AppSettings.JwtSecretKey);
-            tokenHandler.ValidateToken(token, new TokenValidationParameters
-            {
-                ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(key),
-                ValidateIssuer = false,
-                ValidateAudience = false,
-                RequireExpirationTime = false,
-                ClockSkew = TimeSpan.Zero
-            }, out SecurityToken validatedToken);
+        //    var tokenHandler = new JwtSecurityTokenHandler();
+        //    var key = Encoding.ASCII.GetBytes(AppSettings.JwtSecretKey);
+        //    tokenHandler.ValidateToken(token, new TokenValidationParameters
+        //    {
+        //        ValidateIssuerSigningKey = true,
+        //        IssuerSigningKey = new SymmetricSecurityKey(key),
+        //        ValidateIssuer = false,
+        //        ValidateAudience = false,
+        //        RequireExpirationTime = false,
+        //        ClockSkew = TimeSpan.Zero
+        //    }, out SecurityToken validatedToken);
 
-            var jwtToken = (JwtSecurityToken)validatedToken;
-            var accountId = Guid.Parse(jwtToken.Claims.First(x => x.Type == JwtRegisteredClaimNames.NameId).Value);
+        //    var jwtToken = (JwtSecurityToken)validatedToken;
+        //    var accountId = Guid.Parse(jwtToken.Claims.First(x => x.Type == JwtRegisteredClaimNames.NameId).Value);
 
-            var userConnection = Users.GetOrAdd(
-                accountId,
-                new HubUser { UserId = accountId, ConnectionIds = new HashSet<string>() }
-            );
+        //    var userConnection = Users.GetOrAdd(
+        //        accountId,
+        //        new HubUser { UserId = accountId, ConnectionIds = new HashSet<string>() }
+        //    );
 
-            lock (userConnection.ConnectionIds)
-            {
-                userConnection.ConnectionIds.Add(Context.ConnectionId);
-            }
+        //    lock (userConnection.ConnectionIds)
+        //    {
+        //        userConnection.ConnectionIds.Add(Context.ConnectionId);
+        //    }
 
-            await base.OnConnectedAsync();
-        }
-        catch (Exception exception)
-        {
-            Console.WriteLine($"{exception.Message} in auctionHub");
-            throw;
-        }
+        //    await base.OnConnectedAsync();
+        //}
+        //catch (Exception exception)
+        //{
+        //    Console.WriteLine($"{exception.Message} in auctionHub");
+        //    throw;
+        //}
+        return base.OnConnectedAsync();
     }
 
     public override async Task OnDisconnectedAsync(Exception exception)

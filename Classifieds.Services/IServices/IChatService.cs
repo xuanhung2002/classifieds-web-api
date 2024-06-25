@@ -18,6 +18,6 @@ namespace Classifieds.Services.IServices
         Task<object> AddUserToGroup(Guid chatId, Guid userId, Guid currentUserId);
         Task<object> Delete(Guid chatId);
         Task<object> LeaveCurrentChat(Guid chatId, Guid currentUserId);
-        object UpLoadImage(Stream image);
+        Task<string> UpLoadImage(Stream image);
     }
 }

@@ -203,10 +203,12 @@ namespace Classifieds.Services.Services
             post.AuctionStatus = AuctionStatus.Opening;
             post.StartAmount = dto.StartAmount;
             post.CurrentAmount = null;
+            post.CurrentBidderId = null;
             post.EndTime = dto.EndTime;
 
             await _repository.UpdateAsync(post);
             _logger.LogInformation($"Update post: {post.Id}");
+            await _hubContext.Clients.Group($"Post-{post.Id}").SendAsync("AuctionStarted");
         }
 
         public async Task CloseAuction(Guid id, Guid userId)
