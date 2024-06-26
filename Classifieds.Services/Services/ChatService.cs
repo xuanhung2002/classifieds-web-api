@@ -368,8 +368,9 @@ namespace Classifieds.Services.Services
 
             // Retrieve the latest 20 messages for this chat
             var messages = await _repository.GetSet<ChatMessage>(cm => cm.ChatId == chatId)
-                                            .OrderBy(cm => cm.CreatedAt)
+                                            .OrderByDescending(cm => cm.CreatedAt)
                                             .Take(20)
+                                            .OrderBy(cm => cm.CreatedAt)
                                             .ToListAsync();
 
             // Prepare user response list

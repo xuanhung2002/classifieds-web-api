@@ -99,6 +99,35 @@ namespace Classifieds.Services.SignalR
                 }
             }
 
+            var messageResponse = new MessageResponse
+            {
+                Id = Guid.Empty,
+                ChatId = message.ChatId,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow,
+                Type = message.Type,
+                FromUserId = message.FromUser.Id,
+                User = message.FromUser,
+                Message = message.Message
+            };
+
+            var sendTasks = sockets.Select(async socket =>
+            {
+                try
+                {
+                    await Clients.Client(socket).SendAsync("received", messageResponse);
+                   
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning("Send chat socket failed");
+                }
+            });
+            await Task.WhenAll(sendTasks);
+            //_logger.LogInformation("Sending ReceiveMessageNotification to group: User-{0}", message.ToUserId);
+            await _notificationHubContext.Clients.Group($"User-{message.ToUserId.First()}").SendAsync("ReceiveMessageNotification", "You have new message");
+            _logger.LogInformation("Send notification chat");
+
             try
             {
                 var msg = new ChatMessage
@@ -110,33 +139,7 @@ namespace Classifieds.Services.SignalR
                 };
 
                 await _repository.AddAsync(msg);
-
-                var messageResponse = new MessageResponse
-                {
-                    Id = msg.Id,
-                    ChatId = msg.ChatId,
-                    CreatedAt = msg.CreatedAt,
-                    UpdatedAt = msg.CreatedAt,
-                    Type = msg.Type,
-                    FromUserId = message.FromUser.Id,
-                    User = message.FromUser,
-                    Message = msg.Message
-                };
-
-                var sendTasks = sockets.Select(async socket =>
-                {
-                    try
-                    {
-                        await Clients.Client(socket).SendAsync("received", messageResponse);
-                        await Clients.Clients($"User-{message.ToUserId.ToString()}").SendAsync("ReceiveMessageNotification");
-                    }
-                    catch (Exception ex)
-                    {
-                        
-                    }
-                });
-
-                await Task.WhenAll(sendTasks);
+               
             }
             catch (Exception ex)
             {

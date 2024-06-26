@@ -243,10 +243,13 @@ namespace Classifieds.Services.Services
 
 
                 var winnerUser = await _repository.FindAsync<User>(s => s.Id == entity.CurrentBidderId);
-                
-                var message =
-                    $@"<p>You wil in auction for item: {entity.Subject}</p>
-                            <p>Contact to post owner to have a deal</p>";
+
+                var message = $@"
+                            <p>You have won the auction for item: {entity.Subject}</p>
+                            <p>Contact the post owner to finalize the deal.</p>
+                            <p>Click the link to go to the post: <a href='https://classifieds-web-ui.vercel.app/post/{entity.Id}'>https://classifieds-web-ui.vercel.app/post/{entity.Id}</a></p>
+                            ";
+
 
 
                 _emailService.Send(

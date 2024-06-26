@@ -27,7 +27,7 @@ namespace Classifieds.Services.Services
 
         public async Task<List<CategoryDto>> GetAllAsync()
         {
-            var result = (await _repository.GetAsync<Category>()).Select(s => _mapper.Map<CategoryDto>(s)).ToList();
+            var result = (await _repository.GetAsync<Category>()).Select(s => _mapper.Map<CategoryDto>(s)).OrderBy(s => s.UpdatedAt).ToList();
             return result;
         }
         public async Task<Category> AddAsync(AddCategoryRequest dto)
